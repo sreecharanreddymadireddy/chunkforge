@@ -2,8 +2,8 @@
 
 ChunkForge is a retrieval-augmented generation (RAG) workbench for measuring how
 document-processing and chunking choices affect retrieval quality. The current
-release implements a reproducible local environment and a production-style batch
-ingestion pipeline for arXiv machine-learning papers.
+release implements a reproducible local environment, a batch ingestion pipeline
+for arXiv machine-learning papers, and a five-strategy chunking lab.
 
 ## Current capabilities
 
@@ -12,6 +12,8 @@ ingestion pipeline for arXiv machine-learning papers.
 - Layout-aware PDF parsing with repeated-margin removal, page-number filtering,
   conservative dehyphenation, and two-column ordering.
 - Clean-text output with page-level character spans and parsing statistics.
+- Fixed-token, recursive, semantic, sentence-window, and passage-local late chunking.
+- Source-preserving chunk offsets, token budgets, and contextual pooled vectors.
 - Environment-driven FastAPI configuration and a liveness endpoint with OpenAPI docs.
 - Local PostgreSQL/pgvector, Redis, Kafka, and Ollama services through Docker Compose.
 - Ruff linting, strict mypy checks, pytest coverage, and GitHub Actions CI.
@@ -29,7 +31,7 @@ Question -> query embedding --------------------------------------------+       
 Angular UI <- FastAPI JSON <- cited answer <- Ollama + retrieved evidence
 ```
 
-The ingestion path is implemented. Chunking, embedding persistence, hybrid
+The ingestion and chunking paths are implemented. Embedding persistence, hybrid
 retrieval, grounded answer generation, and the Angular comparison interface are
 documented in the architecture roadmap and will be added incrementally.
 
@@ -45,6 +47,9 @@ Detailed diagrams are available in the
 Node.js is not required until the Angular client is introduced.
 
 ## Quick start
+
+See [Run and test](docs/RUN_AND_TEST.md) for the complete command flow, isolated
+smoke tests, service checks, and current implementation boundaries.
 
 ```bash
 cp .env.example .env
@@ -78,6 +83,35 @@ curl http://localhost:8000/health
 
 The Compose stack uses named volumes, so ordinary container replacement does not
 delete database, broker, cache, or model state.
+
+## Chunking lab
+
+After ingesting the corpus, compare all five strategies on five complete papers:
+
+```bash
+make chunk-compare
+```
+
+The command installs the ML extra and downloads the public BGE-small model on its
+first run. It writes [measured chunk statistics](eval/CHUNKING_RESULTS.md) and an
+adjacent JSON report with source hashes, model revision, and parameters. Model
+weights are not needed for normal unit tests. The first tokenizer load downloads
+and caches tiktoken's public vocabulary.
+
+Fixed windows default to 512 tokens with 50 overlap. Recursive splitting prefers
+paragraphs and sentences with zero overlap. Semantic splitting compares adjacent
+sentence embeddings. Sentence-window chunks keep indexed anchors separate from
+surrounding context. Late chunks retain mean-pooled contextual token vectors.
+
+BGE-small has a 512-model-token limit: late chunking therefore uses separate
+bounded passages and 128-token cores, not whole-document context. tiktoken core
+counts and BGE tokenizer limits are checked separately. Chunk counts are not
+retrieval scores, and different core budgets preclude a same-size quality claim.
+
+Parameters are configured with `CHUNKFORGE_CHUNK_SIZE`, `CHUNKFORGE_CHUNK_OVERLAP`,
+`CHUNKFORGE_SEMANTIC_THRESHOLD`, `CHUNKFORGE_SENTENCE_WINDOW_SIZE`,
+`CHUNKFORGE_LATE_CHUNK_SIZE`, `CHUNKFORGE_TOKEN_ENCODING`,
+`CHUNKFORGE_EMBEDDING_BATCH_SIZE`, and `CHUNKFORGE_EMBEDDING_DEVICE`.
 
 ## Batch ingestion
 
@@ -132,10 +166,10 @@ make test
 make check
 ```
 
-The current suite contains eight tests covering configuration, API behavior, Atom
-metadata parsing, rate limiting, resumable downloads, PDF cleaning, two-column
-ordering, provenance, and parser restartability. The verified suite has 86% overall
-statement coverage.
+The suite covers configuration, API behavior, rate limiting, resumable downloads,
+PDF cleaning and provenance, all five chunking strategies, model-token boundary
+validation, Unicode safety, overlap, contextual pooling, and report generation.
+CI uses deterministic encoder fixtures; the corpus comparison uses the actual BGE model.
 
 ## Repository structure
 
@@ -143,6 +177,7 @@ statement coverage.
 chunkforge/
 ├── chunkforge/api/             FastAPI application
 ├── chunkforge/ingestion/       arXiv downloader and PDF parser
+├── chunkforge/chunking/        five strategies and reproducible comparison
 ├── data/raw/                   ignored source PDFs
 ├── data/processed/             ignored text and provenance output
 ├── docker/postgres/            pgvector initialization
@@ -156,10 +191,9 @@ chunkforge/
 
 ## Roadmap
 
-1. Five chunking strategies with measured token and metadata behavior.
-2. Batched BGE embeddings and PostgreSQL/pgvector HNSW search.
-3. Dense + BM25 retrieval, reciprocal-rank fusion, and cross-encoder reranking.
-4. Redis caching, retry, circuit-breaker, and BM25-only fallback behavior.
-5. Grounded Ollama generation with citations and an evaluation harness.
-6. FastAPI search/answer contracts and an Angular comparison interface.
-7. Kafka-based continuous ingestion and an AWS ECS deployment guide.
+1. Batched BGE embeddings and PostgreSQL/pgvector HNSW search.
+2. Dense + BM25 retrieval, reciprocal-rank fusion, and cross-encoder reranking.
+3. Redis caching, retry, circuit-breaker, and BM25-only fallback behavior.
+4. Grounded Ollama generation with citations and an evaluation harness.
+5. FastAPI search/answer contracts and an Angular comparison interface.
+6. Kafka-based continuous ingestion and an AWS ECS deployment guide.

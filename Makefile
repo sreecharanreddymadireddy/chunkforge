@@ -1,6 +1,7 @@
 SHELL := /bin/sh
 UV_VERSION := 0.8.22
 UV ?= .venv-bootstrap/bin/uv
+DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking
 export UV_CACHE_DIR := $(CURDIR)/.uv-cache
 
 .PHONY: help bootstrap-uv setup lock lint format typecheck test check \
@@ -13,6 +14,7 @@ help:
 	@echo "  make docker-up    Start PostgreSQL, Redis, Kafka, and Ollama"
 	@echo "  make docker-down  Stop the local dependency stack"
 	@echo "  make ingest       Run batch ingestion (implemented in Phase 1)"
+	@echo "  make chunk-compare Compare five chunking strategies on five complete papers"
 	@echo "  make embed        Build embeddings (implemented in Phase 3)"
 	@echo "  make eval         Run retrieval evaluation (implemented in Phase 7)"
 	@echo "  make api          Run FastAPI with reload"
@@ -23,7 +25,7 @@ bootstrap-uv:
 		.venv-bootstrap/bin/python -m pip install --disable-pip-version-check "uv==$(UV_VERSION)")
 
 setup: bootstrap-uv
-	$(UV) sync --extra dev --extra api --extra ingestion
+	$(UV) sync $(DEV_EXTRAS)
 
 lock: bootstrap-uv
 	$(UV) lock
@@ -42,9 +44,13 @@ test:
 
 check: lint typecheck test
 
+.PHONY: chunk-compare
+chunk-compare:
+	$(UV) run $(DEV_EXTRAS) --extra ml python -m chunkforge.chunking.compare
+
 ingest:
-	$(UV) run --extra ingestion python -m chunkforge.ingestion.downloader
-	$(UV) run --extra ingestion python -m chunkforge.ingestion.parser
+	$(UV) run $(DEV_EXTRAS) python -m chunkforge.ingestion.downloader
+	$(UV) run $(DEV_EXTRAS) python -m chunkforge.ingestion.parser
 
 embed:
 	$(UV) run --extra ml --extra storage python -m chunkforge.embeddings.embedder

@@ -16,6 +16,9 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+chunking = [
+  "tiktoken>=0.11,<1",
+]
 api = [
   "fastapi>=0.116,<1",
   "uvicorn[standard]>=0.35,<1",
@@ -69,4 +72,10 @@ plugins = ["pydantic.mypy"]
 [[tool.mypy.overrides]]
 module = "tests.*"
 disallow_untyped_defs = true
+
+[[tool.mypy.overrides]]
+module = ["sentence_transformers.*", "transformers.*", "torch.*", "numpy.*"]
+follow_imports = "skip"
+follow_imports_for_stubs = true
+ignore_missing_imports = true
 

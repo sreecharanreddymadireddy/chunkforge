@@ -2,7 +2,10 @@
 .github
 .env
 .venv
+.venv.pre-phase2
 .venv-bootstrap
+.learning
+.uv-cache
 .mypy_cache
 .pytest_cache
 .ruff_cache

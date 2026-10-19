@@ -20,7 +20,7 @@ jobs:
       - name: Install Python
         run: uv python install 3.12
       - name: Install dependencies
-        run: uv sync --frozen --extra dev --extra api --extra ingestion
+        run: uv sync --frozen --extra dev --extra api --extra ingestion --extra chunking
       - name: Lint
         run: uv run ruff check .
       - name: Type-check

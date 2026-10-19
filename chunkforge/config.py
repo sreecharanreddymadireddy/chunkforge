@@ -34,6 +34,14 @@ class Settings(BaseSettings):
     reranker_model: str = Field(min_length=1)
     raw_data_dir: Path
     processed_data_dir: Path
+    token_encoding: str = "cl100k_base"
+    chunk_size: int = Field(default=512, ge=1)
+    chunk_overlap: int = Field(default=50, ge=0)
+    semantic_threshold: float = Field(default=0.5, ge=-1, le=1)
+    sentence_window_size: int = Field(default=1, ge=0)
+    late_chunk_size: int = Field(default=128, ge=1)
+    embedding_batch_size: int = Field(default=32, ge=1)
+    embedding_device: str = "cpu"
 
 
 @lru_cache(maxsize=1)

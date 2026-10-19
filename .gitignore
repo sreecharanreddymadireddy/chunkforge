@@ -4,6 +4,7 @@
 .github/agents/
 .vscode/
 .venv/
+.venv.pre-phase2/
 .venv-bootstrap/
 .uv-cache/
 .mypy_cache/
