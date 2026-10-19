@@ -21,6 +21,23 @@ result was irrelevant. Passage labels were selected during exploratory inspectio
 they are not a held-out test set and must not be presented as recall@5 or MRR.
 Other retrieved passages can also support the same answer.
 
+## One passage through every ranking stage
+
+For the QiYao-M proxy-training question, passage `2609.34842v1:4` followed this path:
+
+| Stage | Position | Stage score |
+|---|---:|---:|
+| Dense cosine search | 10 | 0.6740015357 |
+| BM25 lexical search | 5 | 10.0078154869 |
+| RRF | 4 | 0.0296703297 |
+| Cross-encoder final order | 2 | 5.1041316986 |
+
+The RRF score is `1/(60+10) + 1/(60+5)`. The final logit changes order, not the
+earlier scores. Source character range is `[8422, 10472)`: start inclusive, end
+exclusive. The full evidence text remains available even though CLI traces show
+only its first 400 characters. Scores across the four rows must not be compared
+numerically as if they shared a scale.
+
 ## A failure worth keeping
 
 For the dead-row question, hybrid rank one was chunk 40, a formula-heavy appendix
