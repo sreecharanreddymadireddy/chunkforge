@@ -52,9 +52,10 @@ Phases 0 through 2 currently provide:
 - BGE sentence similarity and passage-local contextual token pooling;
 - a reproducible five-paper chunk comparison with source hashes.
 
-Embeddings/vector persistence, event-driven ingestion, retrieval,
-generation, resilience, and Angular boxes remain planned until their phases add
-working code and tests.
+Phase 3's embedding wrapper, transactional pgvector store and HNSW indexes now
+have a verified one-paper pilot; the full 200-paper index remains pending.
+Event-driven ingestion, hybrid retrieval, generation, resilience and Angular
+remain planned until their phases add working code and tests.
 
 ## Documentation boundary
 

@@ -3,8 +3,9 @@
 ## Current implementation
 
 Phases 0–2 implement local infrastructure, a health API, PDF ingestion and five
-chunking strategies. Search, generated answers and the Angular UI are future
-work. `/health` reports API liveness, not database/search readiness.
+chunking strategies. Phase 3 adds a verified one-paper vector-indexing pilot;
+the full 200-paper vector index remains pending. Search API routes, generated
+answers and the Angular UI are future work. `/health` reports API liveness.
 
 ```mermaid
 flowchart LR
@@ -135,8 +136,9 @@ Stop only the process you recognize, or use another port for a temporary run:
 make check
 ```
 
-This runs Ruff lint, strict mypy checks and pytest with coverage. Phase 2's
-verified baseline is 23 passing tests and 86% statement coverage. Five existing
+This runs Ruff lint, strict mypy checks and pytest with coverage. The Phase 3
+pilot has 32 passing tests and 88% coverage with integration enabled; without
+the integration flag, the database test is skipped. Five existing
 PyMuPDF SWIG deprecation warnings are reported separately from test failures.
 
 Individual checks:
@@ -210,7 +212,33 @@ which strategy retrieves the best evidence. Late pooling has bounded BGE
 passage context and a smaller core budget; sentence-window anchors carry
 separate surrounding context.
 
-## 8. Logs and shutdown
+## 8. Vector indexing and search pilot
+
+PostgreSQL must be running. Index one full paper across all five strategies:
+
+```bash
+make embed ARGS='--max-documents 1 --query "How does DivOPD choose turns when training agents?"'
+```
+
+This is a real persistence/inference run, not a mocked test. It creates
+`chunkforge_chunks` and `chunkforge_chunks_runs`, stores complete strategy runs
+transactionally and creates partial HNSW indexes. It prints per-strategy counts,
+ranked query results and warm search median latency over 20 repetitions.
+The timings include database connection setup and exclude query embedding.
+
+Run the full 200-paper corpus or query an existing index:
+
+```bash
+make embed
+make embed ARGS='--search-only --query "How does batch selection work?"'
+CHUNKFORGE_RUN_PGVECTOR_TESTS=1 make check
+```
+
+The full corpus job is resumable and can take substantial CPU time. A pilot
+does not establish 200-paper completion or production performance. The local
+database tests create and remove only their own uniquely named test tables.
+
+## 9. Logs and shutdown
 
 ```bash
 make docker-logs
@@ -227,7 +255,7 @@ make docker-down
 Named volumes remain available for the next startup. Avoid `docker compose down
 -v` when you want to retain database, broker, Redis and Ollama state.
 
-## 9. Daily workflow
+## 10. Daily workflow
 
 1. Open the project directory.
 2. Run `make setup` when dependencies changed.
@@ -241,9 +269,7 @@ and the selected diff before committing and publishing a change.
 
 ## Next development gate
 
-Review the chunking mechanisms and explain the difference between tiktoken and
-BGE token counts. Then walk through source offsets, overlap, sentence context
-and late pooling. After the Phase 2 understanding checkpoint, Phase 3 adds the
-embedding wrapper, PostgreSQL schema, HNSW index, persistence and real vector
-queries. `make embed`, `make eval` and `make ui` target future modules and should
-not be used as current quickstart commands.
+Phase 3 is in progress. Review normalization, cosine similarity, model/pooling
+identity, transactional persistence and the HNSW trade-off. The remaining gate
+is indexing all 200 papers and checking wider-corpus queries and timings before
+advancing to hybrid retrieval. `make eval` and `make ui` target future modules.

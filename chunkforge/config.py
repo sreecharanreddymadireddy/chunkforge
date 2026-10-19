@@ -42,6 +42,10 @@ class Settings(BaseSettings):
     late_chunk_size: int = Field(default=128, ge=1)
     embedding_batch_size: int = Field(default=32, ge=1)
     embedding_device: str = "cpu"
+    embedding_dimensions: int = Field(default=384, ge=1, le=2000)
+    vector_table: str = "chunkforge_chunks"
+    hnsw_ef_search: int = Field(default=100, ge=1, le=1000)
+    embedding_query_instruction: str = "Represent this sentence for searching relevant passages: "
 
 
 @lru_cache(maxsize=1)

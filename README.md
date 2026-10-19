@@ -14,6 +14,8 @@ for arXiv machine-learning papers, and a five-strategy chunking lab.
 - Clean-text output with page-level character spans and parsing statistics.
 - Fixed-token, recursive, semantic, sentence-window, and passage-local late chunking.
 - Source-preserving chunk offsets, token budgets, and contextual pooled vectors.
+- Batched, normalized BGE embeddings and transactional pgvector persistence.
+- Strategy-specific HNSW indexes, resumable indexing, and a verified one-paper vector-search pilot.
 - Environment-driven FastAPI configuration and a liveness endpoint with OpenAPI docs.
 - Local PostgreSQL/pgvector, Redis, Kafka, and Ollama services through Docker Compose.
 - Ruff linting, strict mypy checks, pytest coverage, and GitHub Actions CI.
@@ -31,9 +33,10 @@ Question -> query embedding --------------------------------------------+       
 Angular UI <- FastAPI JSON <- cited answer <- Ollama + retrieved evidence
 ```
 
-The ingestion and chunking paths are implemented. Embedding persistence, hybrid
-retrieval, grounded answer generation, and the Angular comparison interface are
-documented in the architecture roadmap and will be added incrementally.
+Ingestion, chunking, and the vector-indexing foundation are implemented. The
+Phase 3 pilot covers one full paper across all five strategies; the full
+200-paper vector index is pending. Hybrid retrieval, answer generation, and
+the Angular comparison interface remain in the roadmap.
 
 Detailed diagrams are available in the
 [`docs/architecture`](docs/architecture/ARCHITECTURE.md) catalog.
@@ -112,6 +115,28 @@ Parameters are configured with `CHUNKFORGE_CHUNK_SIZE`, `CHUNKFORGE_CHUNK_OVERLA
 `CHUNKFORGE_SEMANTIC_THRESHOLD`, `CHUNKFORGE_SENTENCE_WINDOW_SIZE`,
 `CHUNKFORGE_LATE_CHUNK_SIZE`, `CHUNKFORGE_TOKEN_ENCODING`,
 `CHUNKFORGE_EMBEDDING_BATCH_SIZE`, and `CHUNKFORGE_EMBEDDING_DEVICE`.
+
+## Vector indexing pilot
+
+With PostgreSQL running, index one full paper and inspect real vector search:
+
+```bash
+make embed ARGS='--max-documents 1 --query "How does DivOPD choose turns when training agents?"'
+```
+
+See [pilot measurements and limitations](eval/VECTOR_PILOT.md). Index all 200
+papers with `make embed`; unchanged completed document/strategy runs are skipped.
+The job records source/config/model fingerprints and atomically commits chunks
+with their completion manifest. Late vectors retain their pooling convention.
+
+Run the local PostgreSQL integration tests explicitly:
+
+```bash
+CHUNKFORGE_RUN_PGVECTOR_TESTS=1 make check
+```
+
+CI provides an isolated pgvector service. Local integration tests allocate and
+remove only their own uniquely named test tables.
 
 ## Batch ingestion
 

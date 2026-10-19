@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 UV_VERSION := 0.8.22
 UV ?= .venv-bootstrap/bin/uv
-DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking
+DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking --extra storage
 export UV_CACHE_DIR := $(CURDIR)/.uv-cache
 
 .PHONY: help bootstrap-uv setup lock lint format typecheck test check \
@@ -15,7 +15,7 @@ help:
 	@echo "  make docker-down  Stop the local dependency stack"
 	@echo "  make ingest       Run batch ingestion (implemented in Phase 1)"
 	@echo "  make chunk-compare Compare five chunking strategies on five complete papers"
-	@echo "  make embed        Build embeddings (implemented in Phase 3)"
+	@echo "  make embed        Index corpus chunks in pgvector; ARGS='--max-documents 1' for a pilot"
 	@echo "  make eval         Run retrieval evaluation (implemented in Phase 7)"
 	@echo "  make api          Run FastAPI with reload"
 	@echo "  make ui           Run the Angular development server (implemented in Phase 9)"
@@ -53,7 +53,7 @@ ingest:
 	$(UV) run $(DEV_EXTRAS) python -m chunkforge.ingestion.parser
 
 embed:
-	$(UV) run --extra ml --extra storage python -m chunkforge.embeddings.embedder
+	$(UV) run $(DEV_EXTRAS) --extra ml python -m chunkforge.embeddings.index_corpus $(ARGS)
 
 eval:
 	$(UV) run --extra ml --extra storage python -m chunkforge.eval.run_eval

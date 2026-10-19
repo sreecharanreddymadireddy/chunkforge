@@ -56,6 +56,7 @@ packages = ["chunkforge"]
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers --cov=chunkforge --cov-report=term-missing"
 testpaths = ["tests"]
+markers = ["integration: requires an explicitly configured PostgreSQL test connection"]
 
 [tool.ruff]
 line-length = 100

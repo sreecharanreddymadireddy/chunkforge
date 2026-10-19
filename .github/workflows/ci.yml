@@ -10,6 +10,23 @@ permissions:
 jobs:
   quality:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: pgvector/pgvector:0.8.0-pg16
+        env:
+          POSTGRES_USER: chunkforge
+          POSTGRES_PASSWORD: chunkforge
+          POSTGRES_DB: chunkforge_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U chunkforge -d chunkforge_test"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
+    env:
+      CHUNKFORGE_RUN_PGVECTOR_TESTS: "1"
+      CHUNKFORGE_TEST_POSTGRES_DSN: postgresql://chunkforge:chunkforge@localhost:5432/chunkforge_test
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -20,7 +37,7 @@ jobs:
       - name: Install Python
         run: uv python install 3.12
       - name: Install dependencies
-        run: uv sync --frozen --extra dev --extra api --extra ingestion --extra chunking
+        run: uv sync --frozen --extra dev --extra api --extra ingestion --extra chunking --extra storage
       - name: Lint
         run: uv run ruff check .
       - name: Type-check
