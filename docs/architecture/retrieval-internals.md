@@ -1,6 +1,8 @@
 # Retrieval Internals
 
-**Status:** Target design for Phases 3–4 and 7.
+**Status:** Dense/BM25/RRF/reranking implemented through the CLI. Four-paper real-model
+demonstration verified; full 200-paper indexing remains in progress and held-out
+evaluation belongs to Phase 7. HTTP search routes are not implemented yet.
 
 ```mermaid
 flowchart LR
@@ -44,9 +46,11 @@ negation. BM25 rewards rare exact terms and is strong for model names, error cod
 and quoted phrases, but it does not understand paraphrases. RRF combines rankings
 without pretending the incomparable raw scores share one scale.
 
-The cross-encoder is more accurate because it reads the query and candidate
-together. It is also slower, so it reranks 20 candidates instead of scanning every
-chunk.
+The cross-encoder reads the query and candidate together and can improve ordering,
+but is not guaranteed to be more accurate on every query. It is slower, so it
+reranks 20 candidates instead of scanning every chunk. Long passages use explicit
+bounded windows and maximum-window scoring; questions over 128 model tokens fail
+validation rather than being silently truncated.
 
 ## Storage model
 
@@ -84,8 +88,10 @@ erDiagram
     }
 ```
 
-The physical Phase 3 schema may combine chunk and embedding columns for simpler
-queries. The logical model remains the same: one chunk has stable provenance and
+The logical diagram above is a future normalized schema, not current DDL. The
+implemented `chunkforge_chunks` table combines text, offsets, strategy, model/pooling
+identity and embedding; `chunkforge_chunks_runs` holds completion fingerprints.
+There is no separate UUID document table yet. One chunk has provenance and
 one embedding for a specific model/version. If multiple models are compared later,
 embeddings become a separate one-to-many table.
 
@@ -96,8 +102,13 @@ Every final result must retain:
 - chunk and document identifiers;
 - chunking strategy;
 - original text and offsets;
-- dense rank, BM25 rank, RRF score, and reranker score where available;
-- source metadata required to construct citations.
+- separate dense, BM25, RRF and reranker scores where available;
+- stage lists in the trace, from which positions can be inspected;
+- document ID and source character ranges (citation presentation is later work).
+
+The CLI's BM25 snapshot is rebuilt each invocation. See
+[operational boundaries](../HYBRID_RETRIEVAL.md) and
+[measured results](../../eval/HYBRID_RESULTS.md).
 
 Do not return one ambiguous `score` internally. Score provenance is needed to
 debug why a result won.

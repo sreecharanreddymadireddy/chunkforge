@@ -3,7 +3,8 @@
 ChunkForge is a retrieval-augmented generation (RAG) workbench for measuring how
 document-processing and chunking choices affect retrieval quality. The current
 release implements a reproducible local environment, a batch ingestion pipeline
-for arXiv machine-learning papers, and a five-strategy chunking lab.
+for arXiv machine-learning papers, a five-strategy chunking lab, and inspectable
+hybrid retrieval with dependency resilience.
 
 ## Current capabilities
 
@@ -16,6 +17,8 @@ for arXiv machine-learning papers, and a five-strategy chunking lab.
 - Source-preserving chunk offsets, token budgets, and contextual pooled vectors.
 - Batched, normalized BGE embeddings and transactional pgvector persistence.
 - Strategy-specific HNSW indexes, resumable indexing, and a verified one-paper vector-search pilot.
+- BM25 + dense retrieval, hand-written RRF, and cross-encoder reranking (50 -> 20 -> 5).
+- Redis embedding caching, bounded jittered retries, circuit breaking and keyword-only fallback.
 - Environment-driven FastAPI configuration and a liveness endpoint with OpenAPI docs.
 - Local PostgreSQL/pgvector, Redis, Kafka, and Ollama services through Docker Compose.
 - Ruff linting, strict mypy checks, pytest coverage, and GitHub Actions CI.
@@ -35,8 +38,10 @@ Angular UI <- FastAPI JSON <- cited answer <- Ollama + retrieved evidence
 
 Ingestion, chunking, and the vector-indexing foundation are implemented. The
 Phase 3 pilot covers one full paper across all five strategies; the full
-200-paper vector index is pending. Hybrid retrieval, answer generation, and
-the Angular comparison interface remain in the roadmap.
+200-paper vector index is still being built. Hybrid retrieval and resilience are
+implemented as a CLI with real-model demonstrations on a four-paper snapshot.
+Answer generation, search API routes and the Angular comparison interface remain
+in the roadmap. See [retrieval mechanics and limitations](docs/HYBRID_RETRIEVAL.md).
 
 Detailed diagrams are available in the
 [`docs/architecture`](docs/architecture/ARCHITECTURE.md) catalog.
@@ -137,6 +142,24 @@ CHUNKFORGE_RUN_PGVECTOR_TESTS=1 make check
 
 CI provides an isolated pgvector service. Local integration tests allocate and
 remove only their own uniquely named test tables.
+
+## Hybrid search and failure drill
+
+```bash
+make search ARGS='--query "What is Endo-Modality Proxy Training in QiYao-M?" --strategy recursive --repeat 2'
+make search ARGS='--query DivOPD --repeat 4 --fail-dense'
+CHUNKFORGE_RUN_PGVECTOR_TESTS=1 CHUNKFORGE_RUN_REDIS_TESTS=1 make check
+```
+
+The first command loads local BGE and cross-encoder models, builds a BM25 snapshot,
+and prints scored evidence. The second deliberately fails the dense provider;
+keyword evidence remains available and the circuit opens after exhausted calls.
+No containers are stopped by the drill. Model weights download on the first run.
+
+[Hybrid examples](eval/HYBRID_RESULTS.md) record three supporting-passage improvements
+and failure cases, not held-out quality metrics. [Resilience results](eval/RESILIENCE_RESULTS.md)
+record real cache timings and a controlled outage. CI also provisions Redis and
+tests cache expiry using uniquely named keys; it never flushes unrelated data.
 
 ## Batch ingestion
 

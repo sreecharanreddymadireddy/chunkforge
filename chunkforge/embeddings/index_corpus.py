@@ -5,6 +5,11 @@ import hashlib
 import json
 from statistics import median
 from time import perf_counter
+from typing import cast
+
+from redis import Redis
+from redis.backoff import NoBackoff
+from redis.retry import Retry
 
 from chunkforge.chunking.base import Chunker, TokenCounter
 from chunkforge.chunking.fixed import FixedChunker
@@ -15,6 +20,7 @@ from chunkforge.chunking.semantic import SemanticChunker
 from chunkforge.chunking.sentence_window import SentenceWindowChunker
 from chunkforge.config import get_settings
 from chunkforge.embeddings.embedder import Embedder
+from chunkforge.resilience.cache import CacheClient, EmbeddingCache
 from chunkforge.store.pgvector_store import STRATEGIES, PgvectorStore
 
 
@@ -26,6 +32,7 @@ def main() -> None:
     parser.add_argument("--query", default=None, help="Run a real vector query after indexing")
     parser.add_argument("--search-only", action="store_true")
     parser.add_argument("--repetitions", type=int, default=20)
+    parser.add_argument("--cache", action="store_true", help="Cache independent core/query vectors")
     args = parser.parse_args()
     if args.max_documents < 1 or args.repetitions < 1:
         parser.error("Document count and repetitions must be positive")
@@ -47,6 +54,16 @@ def main() -> None:
         settings.embedding_batch_size,
         settings.embedding_query_instruction,
     )
+    client = None
+    if args.cache:
+        client = Redis.from_url(
+            str(settings.redis_url),
+            decode_responses=True,
+            socket_connect_timeout=settings.redis_timeout_seconds,
+            socket_timeout=settings.redis_timeout_seconds,
+            retry=Retry(NoBackoff(), 0),
+        )
+        embedder.cache = EmbeddingCache(cast(CacheClient, client), settings.cache_ttl_seconds)
     store = PgvectorStore(
         str(settings.postgres_dsn),
         settings.embedding_dimensions,
@@ -142,6 +159,8 @@ def main() -> None:
                 ),
                 flush=True,
             )
+    if client is not None:
+        client.close()
 
 
 if __name__ == "__main__":

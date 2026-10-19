@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 UV_VERSION := 0.8.22
 UV ?= .venv-bootstrap/bin/uv
-DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking --extra storage
+DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking --extra storage --extra resilience --extra retrieval
 export UV_CACHE_DIR := $(CURDIR)/.uv-cache
 
 .PHONY: help bootstrap-uv setup lock lint format typecheck test check \
@@ -16,6 +16,7 @@ help:
 	@echo "  make ingest       Run batch ingestion (implemented in Phase 1)"
 	@echo "  make chunk-compare Compare five chunking strategies on five complete papers"
 	@echo "  make embed        Index corpus chunks in pgvector; ARGS='--max-documents 1' for a pilot"
+	@echo "  make search       Hybrid search; ARGS='--query \"your question\" --strategy recursive'"
 	@echo "  make eval         Run retrieval evaluation (implemented in Phase 7)"
 	@echo "  make api          Run FastAPI with reload"
 	@echo "  make ui           Run the Angular development server (implemented in Phase 9)"
@@ -54,6 +55,10 @@ ingest:
 
 embed:
 	$(UV) run $(DEV_EXTRAS) --extra ml python -m chunkforge.embeddings.index_corpus $(ARGS)
+
+.PHONY: search
+search:
+	$(UV) run $(DEV_EXTRAS) --extra ml python -m chunkforge.retrieval.demo $(ARGS)
 
 eval:
 	$(UV) run --extra ml --extra storage python -m chunkforge.eval.run_eval

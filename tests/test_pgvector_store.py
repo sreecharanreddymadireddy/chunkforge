@@ -55,6 +55,15 @@ def test_real_cosine_search_hnsw_resume_and_rollback(store: PgvectorStore) -> No
     assert [r.chunk_index for r in result] == [0, 1, 2]
     assert [r.score for r in result] == pytest.approx([1.0, 2**-0.5, 0.0])
     assert store.search((1.0, 0.0), "fixed", "another-model", "bounded_piece_mean") == []
+    snapshot = store.lexical_snapshot("fixed", "test-model@revision", "bounded_piece_mean")
+    assert [r.chunk_index for r in snapshot] == [0, 1, 2]
+    assert store.lexical_snapshot("fixed", "wrong-model", "bounded_piece_mean") == []
+    assert (
+        store.search(
+            (1.0, 0.0), "fixed", "test-model@revision", "bounded_piece_mean", document_ids=[]
+        )
+        == []
+    )
     store.replace_document("doc", "fixed", records, "source-config-model-fingerprint")
     assert store.counts() == {"fixed": 3}
     invalid = [replace(records[0], chunk=replace(records[0].chunk, token_count=0))]

@@ -197,6 +197,7 @@ class PgvectorStore:
         model_id: str,
         representation: str,
         limit: int = 5,
+        document_ids: list[str] | None = None,
     ) -> list[SearchResult]:
         """Rank by cosine distance with an indexable ORDER BY and model/pooling filters."""
         self._strategy(strategy)
@@ -211,9 +212,10 @@ class PgvectorStore:
                 SELECT doc_id, chunk_index, text, char_start, char_end,
                        1 - (embedding <=> %s::vector) AS score, context_text
                 FROM {} WHERE strategy = {} AND model_id=%s AND representation=%s
+                AND (%s::text[] IS NULL OR doc_id = ANY(%s::text[]))
                 ORDER BY embedding <=> %s::vector LIMIT %s
             """).format(self.table, sql.Literal(strategy)),
-                (value, model_id, representation, value, limit),
+                (value, model_id, representation, document_ids, document_ids, value, limit),
             ).fetchall()
         return [
             SearchResult(
@@ -237,3 +239,27 @@ class PgvectorStore:
                 ).format(self.table)
             ).fetchall()
         return {cast(str, row[0]): int(cast(int, row[1])) for row in rows}
+
+    def lexical_snapshot(
+        self,
+        strategy: str,
+        model_id: str,
+        representation: str,
+    ) -> list[SearchResult]:
+        """Read a consistent ordered BM25 snapshot from the same embedding-space partition."""
+        self._strategy(strategy)
+        with self._connect() as conn:
+            rows = conn.execute(
+                sql.SQL("""
+                SELECT doc_id,chunk_index,text,char_start,char_end,context_text
+                FROM {} WHERE strategy=%s AND model_id=%s AND representation=%s
+                ORDER BY doc_id,chunk_index
+                """).format(self.table),
+                (strategy, model_id, representation),
+            ).fetchall()
+        return [
+            SearchResult(
+                str(r[0]), int(r[1]), str(r[2]), int(r[3]), int(r[4]), 0.0, cast(str | None, r[5])
+            )
+            for r in rows
+        ]

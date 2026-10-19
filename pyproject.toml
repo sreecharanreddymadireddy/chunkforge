@@ -39,6 +39,9 @@ storage = [
 resilience = [
   "redis>=6.4,<7",
 ]
+retrieval = [
+  "rank-bm25>=0.2.2,<1",
+]
 kafka = [
   "confluent-kafka>=2.11,<3",
 ]
@@ -56,7 +59,7 @@ packages = ["chunkforge"]
 [tool.pytest.ini_options]
 addopts = "--strict-config --strict-markers --cov=chunkforge --cov-report=term-missing"
 testpaths = ["tests"]
-markers = ["integration: requires an explicitly configured PostgreSQL test connection"]
+markers = ["integration: requires explicitly enabled PostgreSQL or Redis test services"]
 
 [tool.ruff]
 line-length = 100
@@ -75,7 +78,7 @@ module = "tests.*"
 disallow_untyped_defs = true
 
 [[tool.mypy.overrides]]
-module = ["sentence_transformers.*", "transformers.*", "torch.*", "numpy.*"]
+module = ["sentence_transformers.*", "transformers.*", "torch.*", "numpy.*", "rank_bm25.*"]
 follow_imports = "skip"
 follow_imports_for_stubs = true
 ignore_missing_imports = true

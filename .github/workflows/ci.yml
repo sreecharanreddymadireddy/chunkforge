@@ -11,6 +11,15 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     services:
+      redis:
+        image: redis:7.4.1-alpine
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 12
       postgres:
         image: pgvector/pgvector:0.8.0-pg16
         env:
@@ -27,6 +36,8 @@ jobs:
     env:
       CHUNKFORGE_RUN_PGVECTOR_TESTS: "1"
       CHUNKFORGE_TEST_POSTGRES_DSN: postgresql://chunkforge:chunkforge@localhost:5432/chunkforge_test
+      CHUNKFORGE_RUN_REDIS_TESTS: "1"
+      CHUNKFORGE_TEST_REDIS_URL: redis://localhost:6379/15
     steps:
       - uses: actions/checkout@v4
       - name: Install uv
@@ -37,10 +48,12 @@ jobs:
       - name: Install Python
         run: uv python install 3.12
       - name: Install dependencies
-        run: uv sync --frozen --extra dev --extra api --extra ingestion --extra chunking --extra storage
+        run: >-
+          uv sync --frozen --extra dev --extra api --extra ingestion --extra chunking
+          --extra storage --extra resilience --extra retrieval
       - name: Lint
-        run: uv run ruff check .
+        run: uv run --no-sync ruff check .
       - name: Type-check
-        run: uv run mypy chunkforge tests
+        run: uv run --no-sync mypy chunkforge tests
       - name: Test
-        run: uv run python -m pytest
+        run: uv run --no-sync python -m pytest

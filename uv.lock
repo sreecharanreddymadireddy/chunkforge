@@ -211,6 +211,9 @@ ml = [
 resilience = [
     { name = "redis" },
 ]
+retrieval = [
+    { name = "rank-bm25" },
+]
 storage = [
     { name = "psycopg", extra = ["binary", "pool"] },
 ]
@@ -230,6 +233,7 @@ requires-dist = [
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=8.4,<9" },
     { name = "pytest-cov", marker = "extra == 'dev'", specifier = ">=6.2,<7" },
     { name = "rank-bm25", marker = "extra == 'ml'", specifier = ">=0.2.2,<1" },
+    { name = "rank-bm25", marker = "extra == 'retrieval'", specifier = ">=0.2.2,<1" },
     { name = "redis", marker = "extra == 'resilience'", specifier = ">=6.4,<7" },
     { name = "ruff", marker = "extra == 'dev'", specifier = ">=0.12,<1" },
     { name = "sentence-transformers", marker = "extra == 'ml'", specifier = ">=5.0,<6" },
@@ -237,7 +241,7 @@ requires-dist = [
     { name = "tiktoken", marker = "extra == 'ml'", specifier = ">=0.11,<1" },
     { name = "uvicorn", extras = ["standard"], marker = "extra == 'api'", specifier = ">=0.35,<1" },
 ]
-provides-extras = ["chunking", "api", "ingestion", "ml", "storage", "resilience", "kafka", "dev"]
+provides-extras = ["chunking", "api", "ingestion", "ml", "storage", "resilience", "retrieval", "kafka", "dev"]
 
 [[package]]
 name = "click"

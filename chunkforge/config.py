@@ -46,6 +46,17 @@ class Settings(BaseSettings):
     vector_table: str = "chunkforge_chunks"
     hnsw_ef_search: int = Field(default=100, ge=1, le=1000)
     embedding_query_instruction: str = "Represent this sentence for searching relevant passages: "
+    retrieval_candidates: int = Field(default=50, ge=1, le=100)
+    rerank_candidates: int = Field(default=20, ge=1, le=100)
+    retrieval_limit: int = Field(default=5, ge=1, le=100)
+    rrf_k: int = Field(default=60, ge=1)
+    cache_ttl_seconds: int = Field(default=86400, ge=1)
+    redis_timeout_seconds: float = Field(default=0.25, gt=0)
+    retry_attempts: int = Field(default=3, ge=1)
+    retry_base_delay: float = Field(default=0.1, ge=0)
+    retry_max_delay: float = Field(default=1.0, ge=0)
+    breaker_failure_threshold: int = Field(default=3, ge=1)
+    breaker_recovery_seconds: float = Field(default=30, gt=0)
 
 
 @lru_cache(maxsize=1)

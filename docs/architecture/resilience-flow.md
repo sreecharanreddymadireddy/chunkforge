@@ -1,108 +1,74 @@
-# Resilience and Degraded Operation
+# Resilience and degraded operation
 
-**Status:** Target design for Phase 5. Redis is running in Phase 0, but the cache,
-retry, circuit-breaker, and fallback modules are not implemented yet.
+**Status:** Implemented for CLI retrieval. This diagram describes embedding caching,
+bounded dense-path retries, a process-local circuit breaker and evidence fallback.
+Answer generation and Ollama failure handling are future work.
 
 ```mermaid
-stateDiagram-v2
-    [*] --> Request
-    Request --> CacheLookup
-    CacheLookup --> ReturnCached: cache hit
-    CacheLookup --> DenseSearch: cache miss
-    CacheLookup --> DenseSearch: Redis unavailable
-
-    DenseSearch --> HybridResults: embedding succeeds
-    DenseSearch --> Retry: transient embedding failure
-    Retry --> DenseSearch: retry budget remains
-    Retry --> BreakerOpen: retry budget exhausted
-    BreakerOpen --> BM25Fallback: skip embedding calls
-    BM25Fallback --> DegradedResults
-    BreakerOpen --> HalfOpen: recovery timeout elapsed
-    HalfOpen --> DenseSearch: probe succeeds
-    HalfOpen --> BreakerOpen: probe fails
-
-    HybridResults --> GenerateAnswer
-    DegradedResults --> GenerateAnswer
-    GenerateAnswer --> CitedAnswer: Ollama succeeds
-    GenerateAnswer --> EvidenceOnly: Ollama unavailable
-
-    ReturnCached --> [*]
-    CitedAnswer --> [*]
-    EvidenceOnly --> [*]
+flowchart TD
+    Q[Question] --> L[BM25 over loaded corpus snapshot]
+    Q --> B{Dense circuit admission}
+    B -->|open / probe busy| F[Keyword-only evidence]
+    B -->|closed / admitted probe| R[Bounded retry: at most 3 attempts]
+    R --> C{Redis embedding lookup}
+    C -->|hit| V[Use cached query vector]
+    C -->|miss / cache failure| E[BGE query encoding]
+    E --> W[Best-effort Redis write with TTL]
+    W --> V
+    V --> P[pgvector top-50]
+    P --> S[Successful logical call resets breaker]
+    L --> U[RRF + top-20]
+    S --> U
+    U --> X[Cross-encoder]
+    X -->|success| H[Hybrid top-5 evidence]
+    X -->|operational failure| N[Fused evidence: hybrid_unreranked]
+    R -->|exhausted operational failure| A[Count one breaker failure]
+    A -->|threshold reached| O[Open for cooldown]
+    A --> F
+    L --> F
+    O -->|cooldown ends on next call| T[Admit one half-open probe]
+    T --> R
 ```
 
-## Pattern responsibilities
+A cache hit bypasses query inference, **not** vector search, fusion or reranking.
+The retry operation includes query embedding and database search. Its exhausted
+failure counts once toward the default three-call breaker threshold. A failed
+half-open probe reopens immediately; a successful one closes/reset failures.
 
-| Pattern | Solves | Does not solve |
-|---|---|---|
-| Cache | Repeated expensive embedding or answer work | Correctness of stale data by itself |
-| Retry | Short transient failures | Permanent failures or invalid requests |
-| Exponential backoff | Reduces repeated pressure during failure | Coordinated retry spikes without jitter |
-| Jitter | Spreads retries across callers | Dependency recovery by itself |
-| Circuit breaker | Stops calls to a repeatedly failing dependency | The fallback result itself |
-| Fallback | Preserves useful reduced functionality | Full semantic-search quality |
+## Cache policy
 
-## Cache keys and invalidation
+Only vectors are cached, not answers, search responses or job state. Keys use
+`chunkforge:embedding:v1:<sha256>` over structured model-revision, pooling-role,
+dimensions and exact prepared text. Default TTL is one day. Changed input or
+identity misses immediately. Redis failures and corrupt entries fail open to
+inference; a corrupt provider vector remains a validation error.
 
-```text
-embedding:{model_name}:{normalized_text_sha256}
-search:{retrieval_version}:{strategy}:{normalized_query_sha256}
-answer:{prompt_version}:{corpus_version}:{normalized_query_sha256}
-job:{job_id}
-```
-
-Model, retrieval, prompt, and corpus versions belong in keys. A deployment can
-then invalidate logically by changing a version rather than scanning Redis for
-every old key. Redis values are rebuildable; PostgreSQL remains authoritative.
-
-## Retry policy
-
-- Retry only timeouts, connection failures, rate limits, and documented 5xx errors.
-- Do not retry validation errors, unsupported file types, or malformed requests.
-- Use bounded exponential backoff with random jitter and an overall deadline.
-- Log attempt number, dependency, correlation ID, and terminal outcome.
-
-## Circuit-breaker states
-
-- **Closed:** calls flow normally; failures are counted.
-- **Open:** calls fail fast and use BM25 fallback.
-- **Half-open:** a limited probe determines whether the dependency recovered.
-
-The breaker protects the service and its dependency from a retry storm. It is not
-a health check and should not share global state across unrelated dependencies.
-
-## Degraded responses
-
-A degraded result is explicit, not hidden:
+## Actual degraded contract
 
 ```json
 {
-  "mode": "bm25_fallback",
-  "degraded": true,
-  "warning": "Semantic embeddings are temporarily unavailable.",
-  "results": []
+  "mode": "bm25_only",
+  "reasons": ["dense_circuit_open"],
+  "hits": [],
+  "dense": [],
+  "lexical": [],
+  "fused": []
 }
 ```
 
-If Ollama fails after retrieval, return evidence-only search results when the API
-contract permits it. Never fabricate a generated answer.
+Lists above are empty only to illustrate the response shape; real keyword matches
+populate `hits` and `lexical`. Dense and reranker scores are absent in fallback.
+No generated answer is fabricated. A cold process still requires initial model
+loading and database snapshot access; this is warm-process graceful degradation.
 
-## Code map
+## Scope
 
-- `chunkforge/resilience/cache.py` — Redis cache abstraction and key policy.
-- `chunkforge/resilience/retry.py` — bounded backoff and jitter.
-- `chunkforge/resilience/breaker.py` — closed/open/half-open state machine.
-- `chunkforge/resilience/fallback.py` — BM25-only degraded operation.
-- `chunkforge/embeddings/embedder.py` — cache/retry integration point.
-- `chunkforge/retrieval/pipeline.py` — fallback and response-mode integration.
+Retryable failures are classified operational Python/model and database connection
+exceptions. There is no remote HTTP embedding service or rate-limit handler yet.
+Redis has connect/read timeouts; database connection timeout is ten seconds.
+Hard inference deadlines, distributed breakers, independent persistent lexical
+snapshots and cache single-flight protection are not implemented.
 
-## Design rationale
-
-**Why not retry indefinitely?** It increases user latency, multiplies load on an
-already failing dependency, and consumes worker capacity. A deadline plus circuit
-breaker fails predictably and preserves resources.
-
-**What is safe to cache?** Deterministic embeddings are ideal. Generated answers
-need shorter TTLs and versioned keys because their correctness depends on the
-prompt, model, and corpus version.
-
+See [full contracts and limitations](../HYBRID_RETRIEVAL.md),
+[measured outage/cache results](../../eval/RESILIENCE_RESULTS.md), and
+`tests/test_resilience.py` for deterministic state/concurrency tests.

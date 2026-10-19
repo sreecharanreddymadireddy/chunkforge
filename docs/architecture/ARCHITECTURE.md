@@ -10,10 +10,10 @@ honestly, not make future modules look production-ready.
 | Diagram | Question it answers | Current status |
 |---|---|---|
 | [End-to-end architecture](end-to-end.md) | What are the major components and how do they collaborate? | Foundation, batch ingestion and chunking implemented |
-| [Document ingestion](ingestion-flow.md) | How does a PDF become searchable chunks and vectors? | Batch download/parse and chunking implemented; persistence and events planned |
+| [Document ingestion](ingestion-flow.md) | How does a PDF become searchable chunks and vectors? | Batch download/parse, chunking and persistence implemented; events planned |
 | [Search and RAG generation](search-rag-flow.md) | How does a question become a ranked, cited answer? | Target for Phases 4–6 and 8–9 |
-| [Retrieval internals](retrieval-internals.md) | How do dense search, BM25, RRF, and reranking interact? | Target for Phases 3–4 |
-| [Resilience](resilience-flow.md) | What happens when Redis, embeddings, or Ollama fails? | Target for Phase 5 |
+| [Retrieval internals](retrieval-internals.md) | How do dense search, BM25, RRF, and reranking interact? | Implemented CLI; four-paper real-model demonstration |
+| [Resilience](resilience-flow.md) | What happens when Redis or dense retrieval fails? | Implemented cache, retries, breaker and evidence fallback |
 | [Local Docker topology](local-docker.md) | Which processes, ports, networks, and volumes exist locally? | Dependency stack implemented in Phase 0 |
 | [AWS deployment](aws-deployment.md) | How does the local design map to managed AWS services? | Target for Phase 11 |
 
@@ -54,8 +54,10 @@ Phases 0 through 2 currently provide:
 
 Phase 3's embedding wrapper, transactional pgvector store and HNSW indexes now
 have a verified one-paper pilot; the full 200-paper index remains pending.
-Event-driven ingestion, hybrid retrieval, generation, resilience and Angular
-remain planned until their phases add working code and tests.
+Hybrid retrieval and embedding-dependency resilience are implemented and verified
+through the CLI. Measured examples and limitations are in
+[the retrieval guide](../HYBRID_RETRIEVAL.md). Event-driven ingestion, HTTP search/ask
+routes, generation and Angular remain planned.
 
 ## Documentation boundary
 

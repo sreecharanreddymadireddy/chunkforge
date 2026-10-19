@@ -4,7 +4,8 @@
 
 Phases 0–2 implement local infrastructure, a health API, PDF ingestion and five
 chunking strategies. Phase 3 adds a verified one-paper vector-indexing pilot;
-the full 200-paper vector index remains pending. Search API routes, generated
+the full 200-paper vector index remains in progress. Phases 4–5 add CLI hybrid
+retrieval and dependency resilience. Search API routes, generated
 answers and the Angular UI are future work. `/health` reports API liveness.
 
 ```mermaid
@@ -136,9 +137,15 @@ Stop only the process you recognize, or use another port for a temporary run:
 make check
 ```
 
-This runs Ruff lint, strict mypy checks and pytest with coverage. The Phase 3
-pilot has 32 passing tests and 88% coverage with integration enabled; without
-the integration flag, the database test is skipped. Five existing
+This runs Ruff lint, strict mypy checks and pytest with coverage. Without the
+integration flags, database and Redis tests are skipped. Enable both against the
+local dependency stack with:
+
+```bash
+CHUNKFORGE_RUN_PGVECTOR_TESTS=1 CHUNKFORGE_RUN_REDIS_TESTS=1 make check
+```
+
+The test report shows current counts and coverage. Five existing
 PyMuPDF SWIG deprecation warnings are reported separately from test failures.
 
 Individual checks:
@@ -158,6 +165,22 @@ weights. The first tiktoken load may download its public vocabulary. Passing
 fixture tests is separate from the real-model corpus comparison below.
 
 `make format` reformats source files; it changes files rather than only checking.
+
+### Hybrid retrieval and resilience examples
+
+```bash
+make search ARGS='--query "How does DivOPD remove dead rows?" --strategy recursive --repeat 2 --output /tmp/chunkforge-trace.json'
+make search ARGS='--query DivOPD --repeat 4 --fail-dense'
+jq '.traces[0] | {mode,dense_timings,hits}' /tmp/chunkforge-trace.json
+```
+
+These commands return evidence, not generated answers. `--repeat 2` exposes a
+query-embedding cache hit; `--fail-dense` is a controlled exception injection.
+See [stage contracts, settings and limitations](HYBRID_RETRIEVAL.md).
+Model-heavy commands select the ML extra automatically. `make setup` intentionally
+does not install model runtimes; running it later can remove those optional
+packages, which the next `make search`/`make embed` restores. Do not resynchronize
+the environment while a model-heavy command is running.
 
 ## 6. Test ingestion
 

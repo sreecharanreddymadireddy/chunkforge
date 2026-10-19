@@ -12,6 +12,16 @@ class EmbeddingBackend(SentenceEncoder, ContextEncoder, Protocol):
     """Inject the model behind a small typed contract for deterministic tests."""
 
 
+class VectorCache(Protocol):
+    """Optional vector cache contract; keep the embedder independent of Redis imports."""
+
+    def get(self, identity: str, text: str, dimensions: int) -> tuple[float, ...] | None:
+        """Read a compatible vector or return a cache miss."""
+
+    def put(self, identity: str, text: str, vector: tuple[float, ...]) -> None:
+        """Cache a valid vector with an implementation-defined lifetime."""
+
+
 @dataclass(frozen=True, slots=True)
 class EmbeddedChunk:
     """Source chunk plus its immutable embedding-space identity."""
@@ -47,6 +57,7 @@ class Embedder:
         dimensions: int = 384,
         batch_size: int = 32,
         query_instruction: str = "Represent this sentence for searching relevant passages: ",
+        cache: VectorCache | None = None,
     ) -> None:
         if dimensions < 1 or batch_size < 1 or not model_id:
             raise ValueError("Require positive dimensions/batch_size and a model identity")
@@ -55,6 +66,7 @@ class Embedder:
         self.dimensions = dimensions
         self.batch_size = batch_size
         self.query_instruction = query_instruction
+        self.cache = cache
 
     @staticmethod
     def representation(strategy: str) -> str:
@@ -73,7 +85,14 @@ class Embedder:
                     raise ValueError("Late chunk must carry vectors from the configured model")
                 vectors[i] = normalize_vector(chunk.embedding, self.dimensions)
             else:
-                pending.append(i)
+                identity = self.model_id + ":document:" + self.representation(chunk.strategy)
+                cached = (
+                    self.cache.get(identity, chunk.text, self.dimensions) if self.cache else None
+                )
+                if cached is None:
+                    pending.append(i)
+                else:
+                    vectors[i] = cached
         for start in range(0, len(pending), self.batch_size):
             indices = pending[start : start + self.batch_size]
             encoded = self.backend.encode([chunks[i].text for i in indices])
@@ -81,6 +100,11 @@ class Embedder:
                 raise ValueError("Embedding provider returned an incorrect row count")
             for i, vector in zip(indices, encoded, strict=True):
                 vectors[i] = normalize_vector(vector, self.dimensions)
+                if self.cache:
+                    identity = (
+                        self.model_id + ":document:" + self.representation(chunks[i].strategy)
+                    )
+                    self.cache.put(identity, chunks[i].text, vectors[i])
         return [
             EmbeddedChunk(
                 chunk,
@@ -96,6 +120,11 @@ class Embedder:
         if not query.strip():
             raise ValueError("Query cannot be blank")
         instructed = self.query_instruction + query.strip()
+        identity = self.model_id + ":query:" + self.representation(strategy)
+        if self.cache:
+            cached = self.cache.get(identity, instructed, self.dimensions)
+            if cached is not None:
+                return cached
         if strategy == "late":
             passages = self.backend.contextualize(instructed)
             vector = normalized_mean([v for passage in passages for v in passage.vectors])
@@ -104,4 +133,7 @@ class Embedder:
             if len(rows) != 1:
                 raise ValueError("Query encoder must return exactly one vector")
             vector = rows[0]
-        return normalize_vector(vector, self.dimensions)
+        result = normalize_vector(vector, self.dimensions)
+        if self.cache:
+            self.cache.put(identity, instructed, result)
+        return result
