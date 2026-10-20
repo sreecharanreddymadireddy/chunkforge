@@ -69,4 +69,4 @@ API has no upload/job-status endpoint, and Redis does not cache final answers.
 ## Documentation boundary
 
 The diagrams document ChunkForge's design without relying on private schemas,
-internal URLs, credentials, employer-specific identifiers, or proprietary assets.
+internal URLs, credentials, or proprietary assets.

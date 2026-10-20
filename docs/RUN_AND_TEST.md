@@ -26,7 +26,7 @@ inference, not Ollama.
 Run commands from this directory in VS Code's terminal:
 
 ```bash
-cd /Users/sreecharanreddymadireddy/Documents/GENAI/chunkforge
+cd /path/to/chunkforge
 make help
 ```
 
@@ -106,7 +106,7 @@ make api
 Keep this terminal running. In terminal B:
 
 ```bash
-cd /Users/sreecharanreddymadireddy/Documents/GENAI/chunkforge
+cd /path/to/chunkforge
 curl -i http://localhost:8000/health
 ```
 

@@ -1,7 +1,6 @@
 # ChunkForge — senior engineering interview defense
 
-These are senior-system-design / FAANG-style preparation questions, not a claim
-of company affiliation, endorsement or guaranteed interview success. Defend only
+These are senior-system-design preparation questions. Defend only
 what the code and measured artifacts show. AWS deployment and final 40-label
 evaluation remain explicit gates, not achievements to claim prematurely.
 
@@ -420,5 +419,5 @@ verification, not a multi-broker HA deployment or production outage reduction.
 5. Show pilot misses, fallback trace and Kafka replay evidence; explain next gaps.
 
 Only claim independently verified capabilities and results. A public deployment,
-statistically proven winner or employer impact requires separate evidence. Explain
+statistically proven winner requires separate evidence. Explain
 the code you understand and can change under follow-up questioning.

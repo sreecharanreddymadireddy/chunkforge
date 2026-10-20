@@ -52,7 +52,7 @@ Neither implies production certification. No missing user task is silently marke
 | Process-local breaker/one-slot semaphore         | Not fleet-wide capacity/fairness                                  | Per-dependency serving limits, queues and tenant budgets                                                              |
 | Retry count without universal call deadlines     | Slow native inference can exceed expectations                     | End-to-end budgets, cancellation/isolation and timeout tests                                                          |
 | No tenant/ACL/OAuth2/JWT                         | Unsafe to expose sensitive/public service                         | Enforce source authorization before retrieval, audit and abuse controls                                               |
-| No Vault integration                             | Resume technology isn't demonstrated here                         | Integrate only if deployment requires it; don't claim existing proof                                                  |
+| No Vault integration                             | External secrets management is not implemented                    | Integrate only if deployment requires it; verify secret delivery and rotation                                         |
 | No dependency readiness route                    | Healthy liveness can still fail search                            | Lightweight capability readiness separate from liveness/warmup                                                        |
 | Sparse request tracing/SLO instrumentation       | Hard to quantify production p95/error budgets                     | Correlation IDs, stage histograms, safe logs, dashboards/alerts                                                       |
 | No load/chaos/security audit                     | Unit/live smoke isn't fleet reliability                           | Rate/concurrency/memory tests, controlled failure drills and threat review                                            |
@@ -69,15 +69,13 @@ Neither implies production certification. No missing user task is silently marke
 | Co-task Redis/Ollama ephemeral cloud target      | Cache loss, weight redownload and coupled scaling                 | Separate serving/cache, model mirror/persistence and measured availability                                            |
 | DB backups not restored in cloud yet             | Backup policy alone doesn't prove recovery                        | Restore drill with source counts, index plan and answer checks                                                        |
 
-## Important resume boundary
+## Verification boundary
 
 This repository directly demonstrates local RAG ingestion, chunking, vector search,
 hybrid ranking, resilience, generation, evaluation, API/UI and Kafka flow. It does
-**not** prove production Citi metrics,50,000assets, Vertex/Gemini integration,
-OpenShift, Vault, Apigee, enterprise security, Splunk/AppDynamics or AWS operations
-merely because those appear in background experience. Public docs contain no
-employer-private schemas/URLs/assets. Describe project evidence and employment
-experience separately and accurately.
+**not** establish production scale, enterprise security, high availability or
+verified AWS operation. Only the measurements and verification artifacts in this
+repository support capability claims.
 
 ## Final open inputs
 

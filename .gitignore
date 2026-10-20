@@ -1,5 +1,13 @@
 .DS_Store
 .env
+.env.*
+!.env.example
+AGENTS.md
+.aws/
+.codex/
+*.session.sql
+*.dump
+*.backup
 .learning/
 .github/agents/
 .vscode/

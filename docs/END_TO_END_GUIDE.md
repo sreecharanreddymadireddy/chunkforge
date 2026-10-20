@@ -397,7 +397,7 @@ aren't a public hosted RAG application. Documentation must evolve with contracts
 INTERVIEW contains senior-level architecture, implementation, math, reliability,
 distributed-systems and scaling questions, with concrete examples and follow-ups.
 Start with the two-minute pitch; draw the two lifecycles; then defend why choices
-fit this corpus/hardware. Don't inflate a local experiment into employer impact.
+fit this corpus/hardware. Distinguish local measurements from production validation.
 
 ### Phase 14 — Gap audit
 

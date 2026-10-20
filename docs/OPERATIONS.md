@@ -4,7 +4,7 @@
 
 | Component               | Actual runtime                   | Address / persistence                                      |
 | ----------------------- | -------------------------------- | ---------------------------------------------------------- |
-| Source                  | Local Git checkout + GitHub main | `sreecharanreddymadireddy/chunkforge`                      |
+| Source                  | Local Git checkout + GitHub main | This repository's default branch                        |
 | Angular                 | Host Node dev server             | http://localhost:4200                                      |
 | FastAPI                 | Host `.venv` / Uvicorn           | http://localhost:8000; docs at `/docs`                     |
 | PostgreSQL16 + pgvector | Docker Desktop                   | Host5433 → container 5432; postgres_data volume            |
@@ -20,8 +20,8 @@ Compose ports currently bind all interfaces by default; use a trusted network an
 firewall, or explicitly bind them to loopback before wider exposure. No auth is
 implemented; don't port-forward this demo publicly.
 
-Repo path on this machine: `/Users/sreecharanreddymadireddy/Documents/GENAI/chunkforge`.
-Relative commands below run there unless a block explicitly changes directories.
+Run relative commands from your cloned repository's root unless a block explicitly
+changes directories.
 The optional `app` Compose profile has API/UI images, but complete all-container
 deployment has not been verified under this laptop's memory limit.
 
