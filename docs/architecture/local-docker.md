@@ -1,8 +1,9 @@
 # Local Docker Topology
 
-**Status:** Implemented in Phase 0 for PostgreSQL, Redis, Kafka, and Ollama. The
-FastAPI image is implemented and tested, but FastAPI is not yet a service in
-`docker-compose.yml`. Angular is planned for Phase 9.
+**Status:** Host API/Angular plus Docker dependencies are verified locally. Compose
+also defines optional `app` profile API/frontend builds; that full deployment is
+not verified under this laptop's memory limit. The diagram below records the
+original host-API topology; current inventory is in `../OPERATIONS.md`.
 
 ## Current Phase 0 topology
 
@@ -18,7 +19,7 @@ flowchart TB
         subgraph DOCKER["Docker Desktop Linux VM · chunkforge_default bridge"]
             PG["postgres container<br/>PostgreSQL 16 + pgvector<br/>container :5432"]
             REDIS["redis container<br/>Redis 7.4<br/>container :6379"]
-            KAFKA["kafka container<br/>Kafka 3.9 KRaft<br/>container :9092"]
+            KAFKA["kafka container<br/>Kafka 3.9 KRaft<br/>external :9092 · internal :29092"]
             OLLAMA["ollama container<br/>Ollama server<br/>container :11434"]
         end
 

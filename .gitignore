@@ -27,3 +27,5 @@ data/processed/*
 frontend/.angular/
 frontend/node_modules/
 frontend/dist/
+aws/rendered/
+aws/deploy.env

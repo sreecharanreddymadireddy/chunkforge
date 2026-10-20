@@ -20,6 +20,7 @@ help:
 	@echo "  make eval         Run retrieval evaluation (implemented in Phase 7)"
 	@echo "  make api          Run FastAPI with reload"
 	@echo "  make ui           Run the Angular development server (implemented in Phase 9)"
+	@echo "  make aws-render   Validate operator inputs and render local ECS/IAM JSON (no cloud writes)"
 
 bootstrap-uv:
 	@test -x "$(UV)" || (python3 -m venv .venv-bootstrap && \
@@ -38,7 +39,7 @@ format:
 	.venv/bin/ruff format .
 
 typecheck:
-	.venv/bin/mypy chunkforge tests
+	.venv/bin/mypy chunkforge tests aws/render.py
 
 test:
 	.venv/bin/python -m pytest
@@ -91,3 +92,7 @@ docker-logs:
 
 docker-ps:
 	docker compose ps
+
+.PHONY: aws-render
+aws-render:
+	python3 aws/render.py

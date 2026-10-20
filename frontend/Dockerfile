@@ -6,7 +6,8 @@ COPY . .
 RUN npm run build
 
 FROM nginx:1.28-alpine AS runtime
-COPY nginx.conf /etc/nginx/conf.d/default.conf
+ARG NGINX_CONFIG=nginx.conf
+COPY ${NGINX_CONFIG} /etc/nginx/conf.d/default.conf
 COPY --from=builder /app/dist/chunkforge-ui/browser /usr/share/nginx/html
 EXPOSE 80
 HEALTHCHECK --interval=30s --timeout=3s CMD wget -q -O /dev/null http://127.0.0.1/ || exit 1

@@ -1,5 +1,17 @@
 # ChunkForge
 
+## Engineering guide
+
+- [Visual phase 0–14 atlas](docs/PROJECT_ATLAS.html): open the standalone file in a browser.
+- [End-to-end data journey](docs/END_TO_END_GUIDE.md): actual tokens, vectors, chunk records and scores.
+- [API contracts and flow](docs/API_FLOWS.md) · [Run/debug/deployment inventory](docs/OPERATIONS.md).
+- [Design decisions and alternatives](docs/DESIGN_DECISIONS.md) · [40 senior interview Q&A](INTERVIEW.md).
+- [AWS deployment kit](aws/DEPLOY.md) · [Phase closure and gap audit](docs/GAP_AUDIT.md).
+
+**Live locally, not publicly deployed.** The final evaluation requires thirty
+independently authored questions; AWS execution requires your account/network/cost
+choices. No public endpoint or final held-out benchmark is claimed.
+
 ChunkForge is a retrieval-augmented generation (RAG) workbench for measuring how
 document-processing and chunking choices affect retrieval quality. The current
 release implements a reproducible local environment, a batch ingestion pipeline
@@ -267,9 +279,11 @@ make kafka-consume
 Start the watcher before adding a new PDF. Its initial baseline skips existing
 files. See [complete commands and boundaries](docs/RUN_AND_TEST.md).
 
-## Remaining milestones
+## Remaining execution gates
 
-Thirty user-authored evaluation labels; AWS deployment (Phase 11); final
-documentation consolidation (12); interview bank (13); explicit gap audit (14).
+The documentation, forty-question interview bank and explicit gap audit are now
+present. The AWS task/IAM renderer and deployment guide are prepared, but cloud
+execution is pending. Thirty independently authored labels still gate the final
+benchmark. The [closure ledger](docs/GAP_AUDIT.md) records each phase precisely.
 The optional all-container application profile has not been load-tested on this
 8 GB laptop; host API/UI plus container dependencies is the verified local mode.

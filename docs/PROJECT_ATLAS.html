@@ -1,0 +1,978 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ChunkForge · From source to supported answer</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: light-dark(#f4f6f4, #101b18);
+        --panel: light-dark(#fff, #182822);
+        --ink: light-dark(#18372e, #e6f0ea);
+        --muted: light-dark(#51685e, #b2c5b9);
+        --line: light-dark(#d4e0d8, #3a5347);
+        --accent: light-dark(#205c43, #9fdbb7);
+        --soft: light-dark(#e6f0e9, #253f32);
+        --warn: light-dark(#754c12, #efc57f);
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font:
+          16px/1.6 system-ui,
+          sans-serif;
+      }
+      header,
+      main,
+      footer {
+        max-width: 1180px;
+        margin: auto;
+        padding: 28px;
+      }
+      header {
+        padding-top: 46px;
+      }
+      h1 {
+        font-size: clamp(30px, 4vw, 48px);
+        line-height: 1.12;
+        max-width: 800px;
+        font-weight: 500;
+        margin: 12px 0 18px;
+      }
+      h2,
+      h3 {
+        font-weight: 500;
+        line-height: 1.3;
+      }
+      h2 {
+        font-size: 24px;
+      }
+      h3 {
+        font-size: 18px;
+      }
+      .eyebrow {
+        font-size: 12px;
+        letter-spacing: 0.16em;
+        color: var(--muted);
+      }
+      p {
+        max-width: 850px;
+      }
+      .muted {
+        color: var(--muted);
+      }
+      a {
+        color: var(--accent);
+        text-underline-offset: 3px;
+      }
+      nav {
+        display: flex;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-top: 22px;
+      }
+      section {
+        margin-bottom: 36px;
+      }
+      .zone {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 22px;
+        margin-bottom: 14px;
+      }
+      .zone h3 {
+        margin-top: 0;
+      }
+      .pipeline {
+        display: grid;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 22px;
+      }
+      .node {
+        position: relative;
+        padding: 16px 12px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        min-height: 98px;
+      }
+      .node strong {
+        font-weight: 500;
+        display: block;
+      }
+      .node small {
+        display: block;
+        color: var(--muted);
+        font-size: 13px;
+        margin-top: 6px;
+      }
+      .node:not(:last-child)::after {
+        content: "→";
+        position: absolute;
+        right: -19px;
+        top: 32px;
+        color: var(--muted);
+      }
+      .query .pipeline {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+      }
+      .zone-label {
+        display: flex;
+        justify-content: space-between;
+        gap: 16px;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+      }
+      .zone-label h3 {
+        margin: 0;
+      }
+      .tag {
+        font-size: 12px;
+        color: var(--muted);
+      }
+      .shared {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        padding: 8px 0 18px;
+      }
+      .shared span {
+        border-left: 3px solid var(--accent);
+        padding-left: 12px;
+        font-size: 14px;
+      }
+      .phase-nav {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 8px;
+        margin-bottom: 22px;
+      }
+      button {
+        font: inherit;
+        cursor: pointer;
+        color: var(--ink);
+        border: 1px solid var(--line);
+        background: var(--panel);
+        border-radius: 7px;
+        padding: 10px 12px;
+        text-align: left;
+      }
+      button[aria-pressed="true"] {
+        background: var(--ink);
+        color: var(--bg);
+      }
+      button:hover {
+        outline: 1px solid var(--accent);
+      }
+      button:focus-visible,
+      a:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 3px;
+      }
+      .phase-nav button span {
+        display: block;
+        font-size: 12px;
+        opacity: 0.8;
+      }
+      .stage-head {
+        display: flex;
+        align-items: baseline;
+        justify-content: space-between;
+        gap: 18px;
+        flex-wrap: wrap;
+      }
+      .status {
+        color: var(--warn);
+        font-size: 14px;
+      }
+      .records {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 18px;
+      }
+      .record {
+        min-width: 0;
+      }
+      .record h3 {
+        color: var(--muted);
+        font-size: 14px;
+      }
+      .record pre {
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 18px;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        font:
+          13px/1.65 ui-monospace,
+          monospace;
+        margin: 0;
+      }
+      .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+        margin-top: 20px;
+      }
+      .detail-grid p {
+        margin: 8px 0;
+      }
+      .step-controls {
+        display: flex;
+        justify-content: space-between;
+        gap: 14px;
+        margin-top: 22px;
+      }
+      .step-controls button {
+        text-align: center;
+      }
+      .fact {
+        border-left: 3px solid var(--accent);
+        padding: 8px 16px;
+      }
+      .table-wrap {
+        overflow-x: auto;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 12px;
+        text-align: left;
+      }
+      th {
+        font-weight: 500;
+      }
+      footer {
+        color: var(--muted);
+        font-size: 14px;
+        border-top: 1px solid var(--line);
+      }
+      .legend {
+        font-size: 13px;
+        color: var(--muted);
+      }
+      @media (max-width: 760px) {
+        header,
+        main,
+        footer {
+          padding: 20px;
+        }
+        .pipeline,
+        .query .pipeline {
+          grid-template-columns: 1fr;
+        }
+        .node {
+          min-height: auto;
+        }
+        .node:not(:last-child)::after {
+          content: "↓";
+          top: auto;
+          bottom: -25px;
+          left: 16px;
+        }
+        .records,
+        .detail-grid {
+          grid-template-columns: 1fr;
+        }
+        .phase-nav {
+          grid-template-columns: repeat(3, 1fr);
+        }
+        .zone {
+          padding: 18px;
+        }
+      }
+      @media print {
+        button,
+        .phase-nav {
+          display: none;
+        }
+        .zone,
+        .record pre {
+          break-inside: avoid;
+        }
+        body {
+          font-size: 12px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="eyebrow">CHUNKFORGE / ENGINEERING FIELD GUIDE</div>
+      <h1>From source document<br />to supported answer.</h1>
+      <p class="muted">
+        A visual map of all fifteen phases. Inspect what enters each stage, what
+        leaves it, where state lives, and which claims are actually verified.
+      </p>
+      <nav aria-label="Guide documents">
+        <a href="END_TO_END_GUIDE.md">Full walkthrough</a
+        ><a href="API_FLOWS.md">API contracts</a
+        ><a href="OPERATIONS.md">Run & debug</a
+        ><a href="../INTERVIEW.md">40 interview defenses</a
+        ><a href="GAP_AUDIT.md">Gaps & closure</a
+        ><a href="../aws/DEPLOY.md">AWS execution guide</a>
+      </nav>
+    </header>
+    <main>
+      <section aria-labelledby="architecture">
+        <h2 id="architecture">Two lifecycles. Shared evidence.</h2>
+        <div class="zone">
+          <div class="zone-label">
+            <h3>Document lifecycle</h3>
+            <span class="tag">Batch or Kafka · background work</span>
+          </div>
+          <div class="pipeline">
+            <div class="node">
+              <strong>Source PDF</strong
+              ><small>arXiv / new file<br />hash + identity</small>
+            </div>
+            <div class="node">
+              <strong>Batch / Kafka</strong
+              ><small>Direct parse or<br />metadata event → worker</small>
+            </div>
+            <div class="node">
+              <strong>Parse & chunk</strong
+              ><small
+                >Clean text, source spans<br />five strategy variants</small
+              >
+            </div>
+            <div class="node">
+              <strong>BGE encode</strong
+              ><small>384 coordinates<br />normalize + model identity</small>
+            </div>
+            <div class="node">
+              <strong>PostgreSQL</strong
+              ><small>Text + vectors + HNSW<br />transaction + manifest</small>
+            </div>
+          </div>
+        </div>
+        <div class="shared" aria-label="Persistence roles">
+          <span>PostgreSQL: durable evidence</span
+          ><span>Redis: embedding cache, not answers</span
+          ><span>Kafka: ingestion events, not questions</span>
+        </div>
+        <div class="zone query">
+          <div class="zone-label">
+            <h3>Question lifecycle</h3>
+            <span class="tag">Synchronous · one local inference slot</span>
+          </div>
+          <div class="pipeline">
+            <div class="node">
+              <strong>Angular</strong
+              ><small>Question + strategy<br />typed HTTP request</small>
+            </div>
+            <div class="node">
+              <strong>FastAPI</strong
+              ><small>Validate + admit<br />refresh source snapshot</small>
+            </div>
+            <div class="node">
+              <strong>Retrieve</strong
+              ><small>BM25 + Redis/BGE<br />pgvector cosine</small>
+            </div>
+            <div class="node">
+              <strong>Fuse & rerank</strong
+              ><small>RRF → 20 pairs → 5<br />/search returns here</small>
+            </div>
+            <div class="node">
+              <strong>Ollama</strong
+              ><small>/ask only<br />bounded numbered evidence</small>
+            </div>
+            <div class="node">
+              <strong>Validate</strong
+              ><small>Cite / abstain / degrade<br />response → Angular</small>
+            </div>
+          </div>
+        </div>
+        <p class="legend">
+          Architecture arrows show logical dependencies. BM25 runs before the
+          protected dense call; a Redis hit does not skip database search or
+          answer generation. The full walkthrough also shows actual BGE token
+          IDs, attention mask and tensor dimensions.
+        </p>
+      </section>
+      <section aria-labelledby="phases">
+        <h2 id="phases">Inspect the data at every phase</h2>
+        <p class="muted">
+          Main question: “How does DivOPD select turns for training?” Document:
+          2609.34838v1. Different historical snapshots and the Kafka fixture are
+          explicitly labeled.
+        </p>
+        <div id="phase-nav" class="phase-nav" aria-label="Choose a phase"></div>
+        <div class="zone" aria-live="polite">
+          <div class="stage-head">
+            <h2 id="stage-title"></h2>
+            <span id="stage-status" class="status"></span>
+          </div>
+          <p id="stage-purpose"></p>
+          <div class="records">
+            <div class="record">
+              <h3>INPUT / BEFORE</h3>
+              <pre id="stage-input"></pre>
+            </div>
+            <div class="record">
+              <h3>OUTPUT / AFTER</h3>
+              <pre id="stage-output"></pre>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <div>
+              <h3>Where it lives</h3>
+              <p id="stage-store"></p>
+            </div>
+            <div>
+              <h3>Why / trade-off / failure</h3>
+              <p id="stage-tradeoff"></p>
+            </div>
+          </div>
+          <p class="fact" id="stage-defense"></p>
+          <div class="step-controls">
+            <button id="previous" type="button">← Previous phase</button
+            ><button id="next" type="button">Next phase →</button>
+          </div>
+        </div>
+      </section>
+      <section>
+        <h2>What the measured pilot says</h2>
+        <p class="muted">
+          10 seed questions · same 60 documents · source-span evidence labels.
+          The current index contains 75 documents; this recorded pilot remains a
+          60-document experiment.
+        </p>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Strategy</th>
+                <th>Recall@5</th>
+                <th>MRR@5</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Fixed</td>
+                <td>0.7000</td>
+                <td>0.3583</td>
+              </tr>
+              <tr>
+                <td>Recursive</td>
+                <td>0.9500</td>
+                <td>0.6250</td>
+              </tr>
+              <tr>
+                <td>Semantic</td>
+                <td>0.8000</td>
+                <td>0.4500</td>
+              </tr>
+              <tr>
+                <td>Sentence window</td>
+                <td>0.7000</td>
+                <td>0.3233</td>
+              </tr>
+              <tr>
+                <td>Passage-local late</td>
+                <td>0.4000</td>
+                <td>0.2700</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="legend">
+          Not a universal winner or final benchmark. Thirty independently
+          authored questions remain required.
+        </p>
+      </section>
+      <section>
+        <h2>Where it is live</h2>
+        <div class="fact">
+          <p>
+            Verified local application: Angular localhost:4200 → FastAPI
+            localhost:8000 → Docker dependencies. GitHub hosts source and CI,
+            not the running application.
+          </p>
+          <p>
+            <strong
+              >AWS is not deployed. No public application URL is
+              verified.</strong
+            >
+            The account-specific deployment kit must be executed and tested by
+            the operator.
+          </p>
+        </div>
+      </section>
+    </main>
+    <footer>
+      Recorded observations, not a live monitoring dashboard. Read
+      END_TO_END_GUIDE for code-level mechanisms and OPERATIONS for commands.
+      Nothing in this document calls cloud services or reads your credentials.
+    </footer>
+    <script>
+      const stages = [
+        {
+          title: "Environment",
+          status: "Local verified",
+          purpose:
+            "Make dependencies, configuration and service boundaries reproducible.",
+          input: {
+            files: [
+              "pyproject.toml",
+              "uv.lock",
+              "config.py",
+              ".env",
+              "docker-compose.yml",
+              "Dockerfile.api",
+            ],
+          },
+          output: {
+            host_api: "localhost:8000",
+            host_postgres: "localhost:5433",
+            container_postgres: "postgres:5432",
+            runtime: "Host Python or Python inside API image",
+          },
+          store:
+            "Source/config in checkout; dependencies in .venv; state in named volumes. .env stays outside Git.",
+          tradeoff:
+            "Image is a packaged filesystem; container is an instance. Compose is not Kubernetes. Host/container connection names differ.",
+          defense:
+            "Java bridge: Maven dependencies + configuration + runtime process; Dockerfile is a recipe, not the running service.",
+        },
+        {
+          title: "Batch ingestion",
+          status: "200 parsed documents",
+          purpose:
+            "Turn noisy source PDFs into auditable clean text and page provenance.",
+          input: {
+            source: "arXiv PDFs",
+            concerns: [
+              "two columns",
+              "headers/footers",
+              "hyphenation",
+              "tables",
+            ],
+          },
+          output: {
+            documents: 200,
+            pages: 5666,
+            clean_characters: 18142649,
+            average_characters: 90713.2,
+          },
+          store:
+            "Ignored data/raw and data/processed; source hashes and acquisition/provenance manifests.",
+          tradeoff:
+            "Layout heuristics preserve traceability but are not OCR or semantic table reconstruction.",
+          defense:
+            "Bad source extraction is a retrieval failure before an embedding model is involved.",
+        },
+        {
+          title: "Chunking lab",
+          status: "Five strategies measured",
+          purpose:
+            "Build searchable source spans, not a single diluted whole-paper vector.",
+          input: {
+            text: "We therefore introduce DivOPD…",
+            strategies: [
+              "fixed",
+              "recursive",
+              "semantic",
+              "sentence_window",
+              "late",
+            ],
+          },
+          output: {
+            doc_id: "2609.34838v1",
+            strategy: "recursive",
+            chunk_index: 3,
+            char_start: 6901,
+            char_end: 8682,
+            token_count: 359,
+          },
+          store:
+            "Chunk records preserve exact text and Python character ranges; sentence context is separate metadata.",
+          tradeoff:
+            "Small loses context; large dilutes meaning. Late uses128-core bounded context, not whole-paper attention.",
+          defense:
+            "359 is a chunk counter in tiktoken units, not necessarily359 embedding-model tokens.",
+        },
+        {
+          title: "Embeddings & store",
+          status: "75 documents / all five",
+          purpose:
+            "Encode source/query meaning as comparable numeric directions.",
+          input: {
+            query: "How does DivOPD select turns for training?",
+            tiktoken_ids: [
+              4438, 1587, 8940, 3143, 35, 3373, 10800, 369, 4967, 30,
+            ],
+          },
+          output: {
+            dimensions: 384,
+            query_vector_first_six: [
+              -0.0801944053, -0.0352666374, 0.0565881499, 0.0026149484,
+              -0.063481807, 0.0251936854,
+            ],
+            representation: "bounded_piece_mean",
+            index: "HNSW cosine",
+          },
+          store:
+            "PostgreSQL stores chunks, normalized vectors, model revision and completed run fingerprints.",
+          tradeoff:
+            "HNSW is approximate and costs memory. Same dimensionality alone does not make different model spaces compatible.",
+          defense:
+            "Token IDs are discrete vocabulary references; embedding coordinates are learned numeric features—not interchangeable data.",
+        },
+        {
+          title: "Hybrid retrieval",
+          status: "Real current main-query hit",
+          purpose:
+            "Combine exact terms and semantic meaning, then judge pairs jointly.",
+          input: {
+            candidates: "dense up to50 + BM25 up to50",
+            fusion: "RRF k60",
+            rerank: "20 → 5",
+          },
+          output: {
+            final_rank: 1,
+            doc_id: "2609.34838v1",
+            chunk_index: 3,
+            dense_score: 0.7443372677,
+            bm25_score: 21.5760734921,
+            rrf_score: 0.0308349146,
+            rerank_logit: 5.6803488731,
+          },
+          store:
+            "Candidates and fused/reranked arrays live in request memory. CLI can explicitly save full traces.",
+          tradeoff:
+            "RRF combines ranks, not raw scores. Cross-encoder costs CPU and cannot recover an absent candidate.",
+          defense:
+            "None of these four scores is a confidence percentage; never compare their numeric magnitudes directly.",
+        },
+        {
+          title: "Resilience",
+          status: "Cache + injected outage verified",
+          purpose:
+            "Avoid repeated inference and retain honest degraded evidence on failure.",
+          input: {
+            identity: "model@revision:query:bounded_piece_mean",
+            prepared_text: "BGE retrieval instruction + question",
+            command: "Redis GET hashed identity",
+          },
+          output: {
+            redis_type: "string",
+            payload: "JSON array,384 numbers",
+            configured_ttl_seconds: 86400,
+            observed_remaining_ttl_seconds: 59804,
+            cache_hit: "Skip query inference, not retrieval/generation",
+          },
+          store:
+            "Redis embedding cache; breaker state/counters are process-local; PostgreSQL remains evidence store.",
+          tradeoff:
+            "Retry+jitter bounds attempts, breaker skips repeated failure, BM25 fallback loses semantic capability and needs a warm snapshot.",
+          defense:
+            "Recorded dense outage: third failed request opened the breaker; fourth skipped dense work and returned keyword evidence.",
+        },
+        {
+          title: "Grounded generation",
+          status: "Real answer + refusal verified",
+          purpose:
+            "Convert bounded source evidence into readable output, without hiding generation failure.",
+          input: {
+            stored_range: "[6901,8682)",
+            supplied_citation_range: "[6901,7597)",
+            visible_prompt_bytes: 1495,
+            model: "llama3.2:1b",
+          },
+          output: {
+            status: "answered",
+            answer: "DivOPD selects turns based on coverage and focus. [1]",
+            prompt_tokens: 335,
+            output_tokens: 28,
+            citation_format: "application_suffix",
+          },
+          store:
+            "Prompt and response in memory; no automatic answer cache/DB persistence. Ollama volume stores weights.",
+          tradeoff:
+            "Model supplied ID1 but omitted inline marker; application appended it after ID validation. This does not prove entailment/completeness.",
+          defense:
+            "The raw reply is valid enough to format but incomplete relative to source. A working API is not complete answer-quality evaluation.",
+        },
+        {
+          title: "Evaluation",
+          status: "Pilot complete / final labels pending",
+          purpose:
+            "Measure retrieval using source-backed labels instead of answer vibes.",
+          input: {
+            related_question: "How are coverage and focus different in DivOPD?",
+            gold: "Exact source passage",
+            scope: "10 seed questions /60 common documents",
+          },
+          output: {
+            recursive_matching_chunk: 3,
+            first_supporting_rank: 2,
+            recall_at_5: 1,
+            reciprocal_rank: 0.5,
+            fixed: "No gold span recovered in top5",
+          },
+          store:
+            "qa_pairs.json labels; eval/RESULTS.md and RESULTS.json measured outputs/source hashes.",
+          tradeoff:
+            "80%span coverage and source-concentrated labels bias interpretation. Thirty independent user questions remain required.",
+          defense:
+            "Recall measures evidence coverage; MRR rewards first supporting rank, not multi-hop completion or answer truth.",
+        },
+        {
+          title: "FastAPI",
+          status: "Routes live verified",
+          purpose:
+            "Expose validated contracts with bounded local inference capacity.",
+          input: {
+            method: "POST",
+            path: "/ask",
+            body: {
+              query: "How does DivOPD select turns for training?",
+              strategy: "recursive",
+            },
+          },
+          output: {
+            search: "ranked evidence + scores + mode",
+            ask: "answer / insufficient_evidence / evidence_only",
+            health: "liveness only",
+            busy: "429 + Retry-After2",
+          },
+          store:
+            "One lazy backend/model pair per process; response JSON sent to caller, not automatically retained.",
+          tradeoff:
+            "Cold first request loads models. CORS is not auth; one semaphore is not fleet-wide limiting.",
+          defense:
+            "FastAPI is Spring-controller-like; Pydantic validates DTOs; Uvicorn serves the process; OpenAPI documents the contract.",
+        },
+        {
+          title: "Angular",
+          status: "Search + compare + build verified",
+          purpose: "Make evidence, rankings and capability loss inspectable.",
+          input: {
+            form: "query + strategy + operation",
+            browser_route: "/api/search",
+            dev_proxy: "strip /api → backend /search",
+          },
+          output: {
+            search: "source cards with independent scores",
+            ask: "status + cited evidence",
+            compare: "two sequential strategy panels",
+            mobile: "390px: no horizontal overflow in smoke",
+          },
+          store:
+            "Component signals hold interaction state; service owns typed HTTP; no direct browser database access.",
+          tradeoff:
+            "Sequential comparison respects the local one-slot gate. TypeScript interfaces are compile-time, not runtime JSON validation.",
+          defense:
+            "Production Nginx serves compiled static assets; ng serve is a development tool, not the cloud deployment.",
+        },
+        {
+          title: "Kafka ingestion",
+          status: "Isolated real-text PDF replay verified",
+          purpose:
+            "Make a new source document searchable independently of user queries.",
+          input: {
+            fixture: "PDF rendered from actual QiYao-M text",
+            event: "version/doc_id/relative_path/sha256/event_id/strategies",
+            published: "consumer absent",
+          },
+          output: {
+            first_offset: 0,
+            first_chunks: {
+              fixed: 1,
+              recursive: 1,
+              semantic: 1,
+              sentence_window: 11,
+              late: 5,
+            },
+            committed_after_first: 1,
+            lag_after_first: 0,
+            replay_offset: 1,
+            replay: "unchanged counts",
+          },
+          store:
+            "Kafka metadata log, shared PDF files, PostgreSQL chunks/manifests; offsets commit after all strategy work.",
+          tradeoff:
+            "At-least-once plus replay fingerprints, not cross-system exactly-once. Shared path is local; single broker is not HA.",
+          defense:
+            "The question never visits Kafka. Kafka prepares its future evidence; later queries read the resulting index.",
+        },
+        {
+          title: "AWS deployment",
+          status: "Kit prepared / NOT deployed",
+          purpose:
+            "Map local roles to explicit cloud identities, storage and networking.",
+          input: {
+            operator_required: [
+              "account",
+              "region",
+              "VPC/subnets/SGs",
+              "RDS",
+              "DSN secret",
+              "cost approval",
+            ],
+          },
+          output: {
+            renderer: "aws/render.py",
+            documents: [
+              "task-definition",
+              "execution-policy",
+              "s3-ingestion-policy",
+              "task-trust",
+            ],
+            live_public_url: null,
+          },
+          store:
+            "Proposed ECR/ECS/RDS/S3/CloudWatch. No resources or public endpoint have been verified.",
+          tradeoff:
+            "Co-task loopback differs from Compose DNS. Redis/weights are ephemeral cloud-v1; cold starts/coupled scaling are explicit.",
+          defense:
+            "A rendered task definition is not a deployment. Execute, measure, record endpoint, and verify restore/teardown before claiming AWS operation.",
+        },
+        {
+          title: "Documentation",
+          status: "Consolidated",
+          purpose: "Let a new engineer reproduce and diagnose the real system.",
+          input: {
+            evidence: [
+              "code",
+              "SQL counts",
+              "real traces",
+              "measured reports",
+              "known failures",
+            ],
+          },
+          output: {
+            guides: [
+              "END_TO_END_GUIDE",
+              "API_FLOWS",
+              "OPERATIONS",
+              "DESIGN_DECISIONS",
+              "INTERVIEW",
+              "GAP_AUDIT",
+            ],
+          },
+          store:
+            "Versioned public technical documents; private learning notes stay ignored.",
+          tradeoff:
+            "Historical reports remain scoped; do not overwrite their corpus/latency assumptions with current values.",
+          defense:
+            "GitHub source and CI are not a public running application. Corpus/model downloads remain prerequisites after clone.",
+        },
+        {
+          title: "Interview defense",
+          status: "40 senior-level Q&A prepared",
+          purpose:
+            "Explain mechanisms, implementation decisions, measured limits and alternatives.",
+          input: {
+            walkthrough:
+              "Problem → constraints → two lifecycles → real record → failure → measurement",
+          },
+          output: {
+            pitch: "2min project narrative",
+            deep_dive: "40 questions + probes",
+            evidence:
+              "actual local difficulties, not fabricated production incidents",
+          },
+          store: "INTERVIEW.md plus decision/gap evidence documents.",
+          tradeoff:
+            "No list of questions certifies mastery. Explain and change code under follow-up without overstating project scope.",
+          defense:
+            "Lead with constraints and evidence; explain why this design fits them and exactly what would make you choose another approach.",
+        },
+        {
+          title: "Gap audit",
+          status: "Open gates explicit",
+          purpose:
+            "Separate implemented, measured, simplified and externally blocked work.",
+          input: {
+            known_limits: [
+              "no auth/readiness/SLO study",
+              "small concentrated pilot",
+              "single-broker/local paths",
+              "no cloud execution",
+            ],
+          },
+          output: {
+            remaining_user_actions: [
+              "30 independent labels",
+              "AWS choices + actual deployment",
+              "endpoint/restore verification",
+              "self-test understanding",
+            ],
+            v2: "prioritized consequences and proof requirements",
+          },
+          store: "docs/GAP_AUDIT.md is the phase closure ledger.",
+          tradeoff:
+            "No invented homework, credentials, performance percentiles or cloud URLs to make the project look complete.",
+          defense:
+            "Honest boundaries are part of a strong system-design explanation, not a reason to hide completed engineering.",
+        },
+      ];
+      const nav = document.getElementById("phase-nav");
+      let selected = 0;
+      stages.forEach((stage, i) => {
+        const button = document.createElement("button");
+        button.type = "button";
+        button.textContent = `${i} · ${stage.title}`;
+        const subtitle = document.createElement("span");
+        subtitle.textContent =
+          i === 7
+            ? "Final labels pending"
+            : i === 11
+              ? "Execution pending"
+              : "Inspect stage";
+        button.append(subtitle);
+        button.addEventListener("click", () => show(i));
+        nav.append(button);
+      });
+      function show(i) {
+        selected = i;
+        const s = stages[i];
+        document.getElementById("stage-title").textContent =
+          `Phase ${i} · ${s.title}`;
+        document.getElementById("stage-status").textContent = s.status;
+        document.getElementById("stage-purpose").textContent = s.purpose;
+        document.getElementById("stage-input").textContent = JSON.stringify(
+          s.input,
+          null,
+          2,
+        );
+        document.getElementById("stage-output").textContent = JSON.stringify(
+          s.output,
+          null,
+          2,
+        );
+        document.getElementById("stage-store").textContent = s.store;
+        document.getElementById("stage-tradeoff").textContent = s.tradeoff;
+        document.getElementById("stage-defense").textContent = s.defense;
+        [...nav.children].forEach((b, n) =>
+          b.setAttribute("aria-pressed", String(n === i)),
+        );
+        document.getElementById("previous").disabled = i === 0;
+        document.getElementById("next").disabled = i === stages.length - 1;
+      }
+      document
+        .getElementById("previous")
+        .addEventListener("click", () => show(Math.max(0, selected - 1)));
+      document
+        .getElementById("next")
+        .addEventListener("click", () =>
+          show(Math.min(stages.length - 1, selected + 1)),
+        );
+      show(0);
+    </script>
+  </body>
+</html>

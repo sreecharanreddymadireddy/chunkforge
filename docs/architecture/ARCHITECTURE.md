@@ -7,6 +7,10 @@ honestly, not make future modules look production-ready.
 
 ## Diagram catalog
 
+Start with the [phase atlas](../PROJECT_ATLAS.html), [record-by-record guide](../END_TO_END_GUIDE.md)
+and [API sequence](../API_FLOWS.md). The atlas is a standalone interactive document;
+open it in a browser. Older target diagrams remain design references, not deployment evidence.
+
 | Diagram | Question it answers | Current status |
 |---|---|---|
 | [End-to-end architecture](end-to-end.md) | What are the major components and how do they collaborate? | Local application implemented; see measured verification below |
@@ -15,7 +19,7 @@ honestly, not make future modules look production-ready.
 | [Retrieval internals](retrieval-internals.md) | How do dense search, BM25, RRF, and reranking interact? | CLI/API implemented; ten-question evaluation pilot measured |
 | [Resilience](resilience-flow.md) | What happens when Redis or dense retrieval fails? | Implemented cache, retries, breaker and evidence fallback |
 | [Local Docker topology](local-docker.md) | Which processes, ports, networks, and volumes exist locally? | Dependency stack implemented in Phase 0 |
-| [AWS deployment](aws-deployment.md) | How does the local design map to managed AWS services? | Target for Phase 11 |
+| [AWS deployment kit](../../aws/DEPLOY.md) | How do I render and execute the cloud deployment? | Prepared; operator execution pending |
 
 ## Status legend
 
