@@ -263,3 +263,16 @@ class PgvectorStore:
             )
             for r in rows
         ]
+
+    def manifest_version(self, strategy: str) -> str:
+        """Detect additions/replacements using committed manifests, without reading vectors."""
+        self._strategy(strategy)
+        with self._connect() as conn:
+            rows = conn.execute(
+                sql.SQL(
+                    "SELECT doc_id,fingerprint,chunk_count FROM {} "
+                    "WHERE strategy=%s ORDER BY doc_id"
+                ).format(self.runs),
+                (strategy,),
+            ).fetchall()
+        return hashlib.sha256(json.dumps(rows).encode()).hexdigest()

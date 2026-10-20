@@ -1,7 +1,7 @@
 SHELL := /bin/sh
 UV_VERSION := 0.8.22
 UV ?= .venv-bootstrap/bin/uv
-DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking --extra storage --extra resilience --extra retrieval
+DEV_EXTRAS := --extra dev --extra api --extra ingestion --extra chunking --extra storage --extra resilience --extra retrieval --extra generation --extra kafka
 export UV_CACHE_DIR := $(CURDIR)/.uv-cache
 
 .PHONY: help bootstrap-uv setup lock lint format typecheck test check \
@@ -60,11 +60,22 @@ embed:
 search:
 	$(UV) run $(DEV_EXTRAS) --extra ml python -m chunkforge.retrieval.demo $(ARGS)
 
+.PHONY: ask
+ask:
+	$(UV) run $(DEV_EXTRAS) --extra ml python -m chunkforge.generation.demo $(ARGS)
+
+.PHONY: kafka-watch kafka-consume
+kafka-watch:
+	$(UV) run --inexact $(DEV_EXTRAS) --extra ml python -m chunkforge.ingestion.kafka_pipeline watch $(ARGS)
+
+kafka-consume:
+	$(UV) run --inexact $(DEV_EXTRAS) --extra ml python -m chunkforge.ingestion.kafka_pipeline consume $(ARGS)
+
 eval:
-	$(UV) run --extra ml --extra storage python -m chunkforge.eval.run_eval
+	$(UV) run --inexact $(DEV_EXTRAS) --extra ml python -m chunkforge.eval.run_eval $(ARGS)
 
 api:
-	.venv/bin/uvicorn chunkforge.api.main:app --reload --host 0.0.0.0 --port 8000
+	$(UV) run --inexact $(DEV_EXTRAS) --extra ml uvicorn chunkforge.api.main:app --reload --host 127.0.0.1 --port 8000
 
 ui:
 	cd frontend && npm start

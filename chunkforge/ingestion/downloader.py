@@ -24,7 +24,7 @@ from chunkforge.config import get_settings
 
 ARXIV_API_URL = "https://export.arxiv.org/api/query"
 DEFAULT_QUERY = "cat:cs.LG OR cat:stat.ML"
-DEFAULT_MAX_RESULTS = 200
+DEFAULT_MAX_RESULTS = 75
 MIN_REQUEST_INTERVAL_SECONDS = 3.0
 USER_AGENT = "ChunkForge/0.1 (educational RAG research project)"
 

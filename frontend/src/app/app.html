@@ -1,0 +1,15 @@
+<div class="app-shell">
+  <aside class="sidebar">
+    <a class="brand" routerLink="/"><span class="brand-mark">CF</span>ChunkForge</a>
+    <p class="sidebar-caption">Evidence before answers.</p>
+    <nav aria-label="Main navigation">
+      <a routerLink="/" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }"
+        >Search & ask</a
+      ><a routerLink="/compare" routerLinkActive="active">Compare strategies</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <span class="status-dot"></span>{{ apiStatus() }}<small>Local corpus · local inference</small>
+    </div>
+  </aside>
+  <main><router-outlet /></main>
+</div>

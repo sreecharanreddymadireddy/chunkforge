@@ -1,0 +1,1832 @@
+{
+  "pilot": true,
+  "question_count": 10,
+  "user_questions": 0,
+  "documents": [
+    "2609.34838v1",
+    "2609.34842v1",
+    "2609.34847v1",
+    "2609.34849v1",
+    "2609.34850v1",
+    "2609.34851v1",
+    "2609.34857v1",
+    "2609.34860v1",
+    "2609.34861v1",
+    "2609.34866v1",
+    "2609.34887v1",
+    "2609.34904v1",
+    "2609.34907v1",
+    "2609.34911v1",
+    "2609.34915v1",
+    "2609.34916v1",
+    "2609.34921v1",
+    "2609.34924v1",
+    "2609.34929v1",
+    "2609.34931v1",
+    "2609.34933v1",
+    "2609.34939v1",
+    "2609.34944v1",
+    "2609.34962v1",
+    "2609.34965v1",
+    "2609.34970v1",
+    "2609.34975v1",
+    "2609.34976v1",
+    "2609.34985v1",
+    "2609.34986v1",
+    "2609.34990v1",
+    "2609.34992v1",
+    "2609.34994v1",
+    "2609.34995v1",
+    "2609.35005v1",
+    "2609.35011v1",
+    "2609.35021v1",
+    "2609.35028v1",
+    "2609.35029v1",
+    "2609.35034v1",
+    "2609.35035v1",
+    "2609.35038v1",
+    "2609.35042v1",
+    "2609.35044v1",
+    "2609.35047v1",
+    "2609.35054v1",
+    "2609.35055v1",
+    "2609.35058v1",
+    "2609.35060v1",
+    "2609.35065v1",
+    "2609.35066v1",
+    "2609.35072v1",
+    "2609.35073v1",
+    "2609.35075v1",
+    "2609.35080v1",
+    "2609.35082v1",
+    "2609.35083v1",
+    "2609.35084v1",
+    "2609.35086v1",
+    "2609.35096v1"
+  ],
+  "source_hashes": {
+    "2609.34838v1": "f64f0a169e731824ffc5ca864a91507803e1d833ab221f7e72e3c8c6971afa66",
+    "2609.34842v1": "13cd1bd6bd7c22484e2c43ec7b56c8bf56b5c994c2f6b4ecb0e49e56a0e8ebad",
+    "2609.34847v1": "47942257cb3520752a119d9ce848999f8490ed1e8fd79aeb8b726afeaaf4ec3e"
+  },
+  "model": "BAAI/bge-small-en-v1.5@5c38ec7c405ec4b44b94cc5a9bb96e735b38267a",
+  "measurements": [
+    {
+      "strategy": "fixed",
+      "recall_at_5": 0.7,
+      "mrr": 0.35833333333333334,
+      "questions": [
+        {
+          "id": "seed-01",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 4098.345,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 4,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 8,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 29,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 9,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-02",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 4230.001,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 9,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-02:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 21,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 45,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-03",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 3436.276,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 32,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 48,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 45,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-04",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 3616.497,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 37,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-04:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 8,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 51,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 7,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-05",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 3558.045,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 21,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 0,
+              "matched_labels": [
+                "seed-05:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 20,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 4,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-06",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "milliseconds": 3454.706,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 12,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 13,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 0,
+              "matched_labels": [
+                "seed-06:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 49,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-07",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 3538.871,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": [
+                "seed-07:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 17,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 6,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 12,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-08",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 3894.552,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": [
+                "seed-08:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 33,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 6,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 17,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-09",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "milliseconds": 3565.495,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-09:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 17,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-10",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 4073.162,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 31,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 45,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 17,
+              "matched_labels": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "strategy": "recursive",
+      "recall_at_5": 0.95,
+      "mrr": 0.625,
+      "questions": [
+        {
+          "id": "seed-01",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 1667.187,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-01:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 22,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 10,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 8,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 29,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-02",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 1277.848,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-02:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 22,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 45,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 53,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-03",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 1448.328,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-03:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 33,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 32,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-04",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 1838.506,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 10,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-04:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 52,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 7,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 22,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-05",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "milliseconds": 2138.211,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 4,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 21,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 0,
+              "matched_labels": [
+                "seed-05:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 50,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-06",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "milliseconds": 1867.307,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 4,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 7,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 0,
+              "matched_labels": [
+                "seed-06:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 13,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-07",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 1365.484,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-07:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 15,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-08",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 1227.845,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-08:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 32,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 33,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 31,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-09",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "milliseconds": 1189.091,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 4,
+              "matched_labels": [
+                "seed-09:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-10",
+          "recall_at_5": 0.5,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 1310.487,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 22,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 3,
+              "matched_labels": [
+                "seed-10:1"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 0,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 31,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "strategy": "semantic",
+      "recall_at_5": 0.8,
+      "mrr": 0.45,
+      "questions": [
+        {
+          "id": "seed-01",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 1796.899,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 6,
+              "matched_labels": [
+                "seed-01:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 50,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 55,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 9,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-02",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 993.672,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 6,
+              "matched_labels": [
+                "seed-02:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 121,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 142,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 124,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 162,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-03",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 843.622,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 132,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 6,
+              "matched_labels": [
+                "seed-03:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 121,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 25,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 124,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-04",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 986.956,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 21,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 7,
+              "matched_labels": [
+                "seed-04:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 12,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 158,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-05",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 1928.704,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 0,
+              "matched_labels": [
+                "seed-05:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 7,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 164,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 23,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-06",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "milliseconds": 1924.168,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 13,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 7,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 0,
+              "matched_labels": [
+                "seed-06:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 5,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-07",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.25,
+          "milliseconds": 994.54,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 6,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 54,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 62,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": [
+                "seed-07:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 18,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-08",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 1022.524,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 69,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": [
+                "seed-08:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 6,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 28,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 64,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-09",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 1286.524,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 6,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 29,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 2,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 62,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 28,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-10",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 1093.396,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 6,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 56,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 29,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 0,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 1,
+              "matched_labels": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "strategy": "sentence_window",
+      "recall_at_5": 0.7,
+      "mrr": 0.32333333333333336,
+      "questions": [
+        {
+          "id": "seed-01",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 2072.664,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 266,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 41,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 257,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 47,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 3,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-02",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 2586.73,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 266,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 42,
+              "matched_labels": [
+                "seed-02:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 785,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 653,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 655,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-03",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 1184.177,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 697,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 44,
+              "matched_labels": [
+                "seed-03:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 203,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 653,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 136,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-04",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 941.224,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 47,
+              "matched_labels": [
+                "seed-04:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 128,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 99,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 79,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 51,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-05",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.2,
+          "milliseconds": 2239.625,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 214,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 50,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 649,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 647,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 6,
+              "matched_labels": [
+                "seed-05:0"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "seed-06",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.3333333333333333,
+          "milliseconds": 539.977,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 146,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 88,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 7,
+              "matched_labels": [
+                "seed-06:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 50,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 45,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-07",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 1031.101,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 72,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 380,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 292,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 82,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 476,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-08",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.2,
+          "milliseconds": 430.721,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 525,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 93,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 511,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 292,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 41,
+              "matched_labels": [
+                "seed-08:0"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "seed-09",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 330.161,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 296,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 55,
+              "matched_labels": [
+                "seed-09:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 82,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 476,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 153,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-10",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 390.392,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 321,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 85,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 876,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 296,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 36,
+              "matched_labels": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "strategy": "late",
+      "recall_at_5": 0.4,
+      "mrr": 0.27,
+      "questions": [
+        {
+          "id": "seed-01",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 634.802,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 40,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 34,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 88,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 122,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 33,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-02",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 501.064,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 12,
+              "matched_labels": [
+                "seed-02:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 88,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 134,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 37,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 218,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-03",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 324.832,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 72,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 43,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 132,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 134,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 75,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-04",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.2,
+          "milliseconds": 396.808,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 40,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 29,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 212,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 14,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 13,
+              "matched_labels": [
+                "seed-04:0"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "seed-05",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 0.5,
+          "milliseconds": 545.338,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 84,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 2,
+              "matched_labels": [
+                "seed-05:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 200,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 21,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 32,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-06",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 287.806,
+          "hits": [
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 16,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 2,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 12,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 84,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34842v1",
+              "chunk_index": 14,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-07",
+          "recall_at_5": 1.0,
+          "reciprocal_rank": 1.0,
+          "milliseconds": 267.528,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 9,
+              "matched_labels": [
+                "seed-07:0"
+              ]
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 127,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 68,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 13,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-08",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 280.815,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 133,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 20,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 137,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 60,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-09",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 271.412,
+          "hits": [
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 127,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 71,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 73,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 9,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            }
+          ]
+        },
+        {
+          "id": "seed-10",
+          "recall_at_5": 0.0,
+          "reciprocal_rank": 0.0,
+          "milliseconds": 266.263,
+          "hits": [
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 89,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 19,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34838v1",
+              "chunk_index": 151,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 127,
+              "matched_labels": []
+            },
+            {
+              "doc_id": "2609.34847v1",
+              "chunk_index": 22,
+              "matched_labels": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

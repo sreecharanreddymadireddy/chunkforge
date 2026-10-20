@@ -2,11 +2,11 @@
 
 ## Current implementation
 
-Phases 0–2 implement local infrastructure, a health API, PDF ingestion and five
-chunking strategies. Phase 3 adds a verified one-paper vector-indexing pilot;
-the full 200-paper vector index remains in progress. Phases 4–5 add CLI hybrid
-retrieval and dependency resilience. Search API routes, generated
-answers and the Angular UI are future work. `/health` reports API liveness.
+Phases 0–5 implement infrastructure, PDF ingestion, five chunkers, the complete
+75-paper index, hybrid retrieval and dependency resilience. Phases 6–10 add local
+generation, an evaluation pilot, search/answer API routes, Angular and Kafka.
+See the operational commands and remaining gates at the end of this guide.
+`/health` reports API liveness, not dependency readiness.
 
 ```mermaid
 flowchart LR
@@ -290,9 +290,77 @@ Named volumes remain available for the next startup. Avoid `docker compose down
 GitHub reflects the commits pushed to the remote branch. Review `git status`
 and the selected diff before committing and publishing a change.
 
-## Next development gate
+## Phases 6–10: daily application flow
 
-Phase 3 is in progress. Review normalization, cosine similarity, model/pooling
-identity, transactional persistence and the HNSW trade-off. The remaining gate
-is indexing all 200 papers and checking wider-corpus queries and timings before
-advancing to hybrid retrieval. `make eval` and `make ui` target future modules.
+```sh
+make docker-up
+docker compose exec ollama ollama list
+# Only if missing:
+docker compose exec ollama ollama pull llama3.2:1b
+make api
+# Separate terminal: install frontend dependencies once, then run it
+cd frontend
+npm ci
+npm start
+```
+
+Use localhost:4200 for the UI; localhost:8000/docs for interactive API calls.
+Host PostgreSQL uses the port in `.env` (5433 on this development machine),
+whereas container applications use `postgres:5432`.
+
+```sh
+curl -s http://localhost:8000/health
+curl -s -H 'Content-Type: application/json' \
+  -d '{"query":"How does DivOPD select turns for training?","strategy":"recursive"}' \
+  http://localhost:8000/search
+curl --max-time 300 -s -H 'Content-Type: application/json' \
+  -d '{"query":"How does DivOPD select turns for training?","strategy":"recursive"}' \
+  http://localhost:8000/ask
+make eval ARGS='--pilot --documents 60'
+```
+
+Evaluation writes `eval/RESULTS.md` and `.json`; it does not generate answers.
+For the final run, author thirty new source-backed questions and omit `--pilot`.
+The current ten-question run is exploratory, not held-out evidence of generalization.
+
+### Continuous ingestion
+
+```sh
+make kafka-watch
+# Separate terminal; then add a new stable PDF to data/raw/
+make kafka-consume
+docker compose exec kafka /opt/kafka/bin/kafka-consumer-groups.sh \
+  --bootstrap-server localhost:9092 --all-groups --describe
+```
+
+First watcher startup baselines existing files. Avoid `--include-existing` unless
+you intend to enqueue the entire raw directory. A producer acknowledgement precedes
+watcher-state persistence; consumer commit follows completed indexing. Replay skips
+unchanged complete strategy runs. Producer and worker require shared PDF access.
+The host listener is localhost:9092; container clients use kafka:29092.
+
+### Verification and shutdown
+
+```sh
+make check
+CHUNKFORGE_RUN_PGVECTOR_TESTS=1 CHUNKFORGE_RUN_REDIS_TESTS=1 make check
+cd frontend
+npm run build
+npm test -- --watch=false
+```
+
+Stop dev servers/watchers/workers with Ctrl-C. `docker compose down` preserves
+named volumes; do not add `-v` unless intentionally deleting their stored data.
+`/health` is liveness, not dependency readiness. Model-heavy requests are bounded
+to one slot; a concurrent request returns 429. Generation timeout/invalid output
+returns explicit evidence-only output, not an invented answer.
+
+The optional `docker compose --profile app up --build` builds API and Nginx/UI
+containers, but full-profile resource/load verification remains pending. The
+verified low-memory mode is host API/UI plus containerized dependencies. Don't run
+multiple model-loading commands at once on this machine. Avoid `make setup` while
+jobs run: dependency synchronization can change the active virtual environment.
+
+Next: supply the remaining evaluation homework, then AWS deployment, documentation
+consolidation, interview bank and gap audit. See `eval/PHASES_6_TO_10.md` for measured
+results rather than interpreting every implemented feature as a production guarantee.

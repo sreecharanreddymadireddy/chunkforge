@@ -57,6 +57,20 @@ class Settings(BaseSettings):
     retry_max_delay: float = Field(default=1.0, ge=0)
     breaker_failure_threshold: int = Field(default=3, ge=1)
     breaker_recovery_seconds: float = Field(default=30, gt=0)
+    generation_context_size: int = Field(default=2048, ge=1024)
+    generation_output_tokens: int = Field(default=192, ge=32)
+    generation_template_reserve: int = Field(default=256, ge=128)
+    generation_source_bytes: int = Field(default=700, ge=40)
+    generation_temperature: float = Field(default=0, ge=0, le=2)
+    generation_timeout_seconds: float = Field(default=180, gt=0)
+    generation_threads: int = Field(default=2, ge=1)
+    cors_origins: list[str] = ["http://localhost:4200"]
+    kafka_ingestion_topic: str = "chunkforge.ingestion"
+    kafka_dlq_topic: str = "chunkforge.ingestion.dlq"
+    kafka_group_id: str = "chunkforge-ingestion"
+    kafka_max_pdf_bytes: int = Field(default=52428800,ge=1)
+    kafka_watch_interval: float = Field(default=2.0,gt=0)
+    kafka_watcher_state: Path = Path("data/processed/kafka_watcher.json")
 
 
 @lru_cache(maxsize=1)

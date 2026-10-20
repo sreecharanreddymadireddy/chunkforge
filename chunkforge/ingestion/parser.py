@@ -482,6 +482,12 @@ def parse_corpus(
     return summary
 
 
+def write_parsed_document(document: ParsedDocument, processed_dir: Path, stem: str) -> None:
+    """Public single-document output contract for event-driven ingestion."""
+    processed_dir.mkdir(parents=True,exist_ok=True)
+    _write_parsed_document(document,processed_dir,stem)
+
+
 def build_argument_parser() -> argparse.ArgumentParser:
     """Construct the batch parser command-line contract."""
 

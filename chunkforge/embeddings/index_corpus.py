@@ -27,7 +27,7 @@ from chunkforge.store.pgvector_store import STRATEGIES, PgvectorStore
 def main() -> None:
     """Index complete selected papers, skipping only unchanged, committed strategy runs."""
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--max-documents", type=int, default=200)
+    parser.add_argument("--max-documents", type=int, default=75)
     parser.add_argument("--strategies", nargs="+", choices=STRATEGIES, default=list(STRATEGIES))
     parser.add_argument("--query", default=None, help="Run a real vector query after indexing")
     parser.add_argument("--search-only", action="store_true")

@@ -4,7 +4,8 @@ ChunkForge is a retrieval-augmented generation (RAG) workbench for measuring how
 document-processing and chunking choices affect retrieval quality. The current
 release implements a reproducible local environment, a batch ingestion pipeline
 for arXiv machine-learning papers, a five-strategy chunking lab, and inspectable
-hybrid retrieval with dependency resilience.
+hybrid retrieval with dependency resilience, grounded local generation, an Angular
+comparison interface, and replay-safe Kafka ingestion.
 
 ## Current capabilities
 
@@ -19,7 +20,11 @@ hybrid retrieval with dependency resilience.
 - Strategy-specific HNSW indexes, resumable indexing, and a verified one-paper vector-search pilot.
 - BM25 + dense retrieval, hand-written RRF, and cross-encoder reranking (50 -> 20 -> 5).
 - Redis embedding caching, bounded jittered retries, circuit breaking and keyword-only fallback.
-- Environment-driven FastAPI configuration and a liveness endpoint with OpenAPI docs.
+- Typed FastAPI `/search` and `/ask` routes, liveness and OpenAPI docs.
+- Ollama answers with validated citation IDs and explicit abstention/evidence-only states.
+- Angular search, answer and side-by-side strategy comparison screens.
+- Kafka PDF events, manual consumer commits, dead-letter handling and replay-safe indexing.
+- A source-passage-labeled evaluation harness and a measured ten-question pilot.
 - Local PostgreSQL/pgvector, Redis, Kafka, and Ollama services through Docker Compose.
 - Ruff linting, strict mypy checks, pytest coverage, and GitHub Actions CI.
 
@@ -36,12 +41,12 @@ Question -> query embedding --------------------------------------------+       
 Angular UI <- FastAPI JSON <- cited answer <- Ollama + retrieved evidence
 ```
 
-Ingestion, chunking, and the vector-indexing foundation are implemented. The
-Phase 3 pilot covers one full paper across all five strategies; the full
-200-paper vector index is still being built. Hybrid retrieval and resilience are
-implemented as a CLI with real-model demonstrations on a four-paper snapshot.
-Answer generation, search API routes and the Angular comparison interface remain
-in the roadmap. See [retrieval mechanics and limitations](docs/HYBRID_RETRIEVAL.md).
+The local 75-paper index is complete across all five strategies. Generation, API,
+Angular and Kafka flows have live smoke-test evidence; see
+[Phases 6–10 verification](eval/PHASES_6_TO_10.md). The
+[retrieval pilot](eval/RESULTS.md) freezes a common 60-document corpus and uses ten
+seed questions. Thirty independently authored labels remain required before the
+final forty-question benchmark. See [retrieval limitations](docs/HYBRID_RETRIEVAL.md).
 
 Detailed diagrams are available in the
 [`docs/architecture`](docs/architecture/ARCHITECTURE.md) catalog.
@@ -52,7 +57,7 @@ Detailed diagrams are available in the
 - Docker Desktop, or Docker Engine with the Compose plugin
 - GNU Make
 
-Node.js is not required until the Angular client is introduced.
+Use Node.js 26 with the Angular 22 client. The API can run without the frontend.
 
 ## Quick start
 
@@ -85,7 +90,7 @@ curl http://localhost:8000/health
 | Service | Purpose | Default host endpoint |
 |---|---|---|
 | PostgreSQL + pgvector | Document, chunk, metadata, and vector storage | `localhost:5432` |
-| Redis | Reconstructable caches and job state | `localhost:6379` |
+| Redis | Reconstructable embedding cache | `localhost:6379` |
 | Kafka | Event-driven ingestion broker | `localhost:9092` |
 | Ollama | Local language-model server | `localhost:11434` |
 
@@ -129,8 +134,9 @@ With PostgreSQL running, index one full paper and inspect real vector search:
 make embed ARGS='--max-documents 1 --query "How does DivOPD choose turns when training agents?"'
 ```
 
-See [pilot measurements and limitations](eval/VECTOR_PILOT.md). Index all 200
-papers with `make embed`; unchanged completed document/strategy runs are skipped.
+See [pilot measurements and limitations](eval/VECTOR_PILOT.md). Index the selected 75
+papers with `make embed ARGS='--max-documents 200'`, or use `make embed` for the
+75-paper v1 target; unchanged completed document/strategy runs are skipped.
 The job records source/config/model fingerprints and atomically commits chunks
 with their completion manifest. Late vectors retain their pooling convention.
 
@@ -237,11 +243,33 @@ chunkforge/
 └── uv.lock                     reproducible dependency lock
 ```
 
-## Roadmap
+## Run the application
 
-1. Batched BGE embeddings and PostgreSQL/pgvector HNSW search.
-2. Dense + BM25 retrieval, reciprocal-rank fusion, and cross-encoder reranking.
-3. Redis caching, retry, circuit-breaker, and BM25-only fallback behavior.
-4. Grounded Ollama generation with citations and an evaluation harness.
-5. FastAPI search/answer contracts and an Angular comparison interface.
-6. Kafka-based continuous ingestion and an AWS ECS deployment guide.
+```sh
+docker compose exec ollama ollama pull llama3.2:1b
+make api
+# Separate terminal, first run only: cd frontend && npm ci
+make ui
+```
+
+Visit <http://localhost:4200> and <http://localhost:8000/docs>. The first request
+loads retrieval models. Local CPU generation can take minutes; the UI reports
+timeouts and evidence-only output explicitly. Redis caches embeddings, not answers.
+Kafka processes PDF ingestion, not synchronous user questions.
+
+```sh
+make eval ARGS='--pilot --documents 60'
+make kafka-watch
+# Separate terminal:
+make kafka-consume
+```
+
+Start the watcher before adding a new PDF. Its initial baseline skips existing
+files. See [complete commands and boundaries](docs/RUN_AND_TEST.md).
+
+## Remaining milestones
+
+Thirty user-authored evaluation labels; AWS deployment (Phase 11); final
+documentation consolidation (12); interview bank (13); explicit gap audit (14).
+The optional all-container application profile has not been load-tested on this
+8 GB laptop; host API/UI plus container dependencies is the verified local mode.

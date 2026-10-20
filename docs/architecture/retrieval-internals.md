@@ -1,8 +1,9 @@
 # Retrieval Internals
 
-**Status:** Dense/BM25/RRF/reranking implemented through the CLI. Four-paper real-model
-demonstration verified; full 200-paper indexing remains in progress and held-out
-evaluation belongs to Phase 7. HTTP search routes are not implemented yet.
+**Status:** Dense/BM25/RRF/reranking implemented through CLI and HTTP search routes.
+The 75-paper v1 index is complete. A ten-question, common-60-document pilot is
+recorded in `eval/RESULTS.md`; the final benchmark still requires thirty independent
+user-authored labels. See `eval/PHASES_6_TO_10.md` for current verified boundaries.
 
 ```mermaid
 flowchart LR
