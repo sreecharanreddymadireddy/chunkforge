@@ -208,8 +208,11 @@ land in `data/processed`. Both corpus directories are excluded from Git.
 | Average characters per document | 90,713.2 |
 | Document failures | 0 |
 
-The parser intentionally reports ambiguity instead of inventing structure. OCR for
-image-only pages and semantic table reconstruction are outside the current scope.
+The parser preserves native text by default. Opt-in Tesseract OCR handles low-text
+pages dominated by a raster scan, with page-level extraction provenance, language
+pack/configuration-aware caching, and page/pixel budgets. OCR is off by default;
+semantic table reconstruction, handwriting and general multimodal understanding
+remain outside the verified scope. See [OCR setup and five-document lab](docs/OCR.md).
 
 ## Configuration
 

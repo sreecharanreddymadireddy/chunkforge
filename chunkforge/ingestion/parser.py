@@ -16,15 +16,16 @@ import re
 import unicodedata
 from collections import Counter
 from collections.abc import Sequence
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, cast
+from typing import Any, Literal, cast
 
 import pymupdf
 
 from chunkforge.config import get_settings
+from chunkforge.ingestion.ocr import OcrOptions, needs_ocr, recognize_page
 
-PARSER_VERSION = "1.0"
+PARSER_VERSION = "1.1"
 MARGIN_FRACTION = 0.12
 REPEATED_MARGIN_THRESHOLD = 0.60
 PAGE_NUMBER_PATTERN = re.compile(r"^(?:page\s*)?\d+(?:\s*(?:of|/)\s*\d+)?$", re.IGNORECASE)
@@ -60,6 +61,8 @@ class ExtractedPage:
     height: float
     blocks: tuple[TextBlock, ...]
     two_column: bool
+    extraction_method: Literal["native", "ocr"] = "native"
+    native_characters: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,6 +73,8 @@ class PageSpan:
     char_start: int
     char_end: int
     two_column: bool
+    extraction_method: Literal["native", "ocr"] = "native"
+    native_characters: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -84,6 +89,7 @@ class DocumentStatistics:
     repeated_margin_lines_removed: int
     page_numbers_removed: int
     dehyphenations: int
+    ocr_page_count: int = 0
 
 
 @dataclass(frozen=True, slots=True)
@@ -96,6 +102,7 @@ class ParsedDocument:
     text: str
     page_spans: tuple[PageSpan, ...]
     statistics: DocumentStatistics
+    ocr_options: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass(frozen=True, slots=True)
@@ -147,16 +154,18 @@ def _canonical_margin_line(value: str) -> str:
     return DIGIT_PATTERN.sub("#", normalized)
 
 
-def _extract_blocks(page: pymupdf.Page) -> list[TextBlock]:
+def _extract_blocks(
+    page: pymupdf.Page, textpage: pymupdf.TextPage | None = None
+) -> list[TextBlock]:
     """Extract text blocks while filtering images and empty content."""
 
     raw_blocks = cast(
         list[tuple[Any, ...]],
-        page.get_text("blocks", sort=True),  # type: ignore[no-untyped-call]
+        page.get_text("blocks", sort=True, textpage=textpage),  # type: ignore[no-untyped-call]
     )
     blocks: list[TextBlock] = []
     for raw in raw_blocks:
-        if len(raw) < 5:
+        if len(raw) < 5 or (len(raw) > 6 and raw[6] != 0):
             continue
         text = _normalize_unicode(str(raw[4])).strip()
         if not text:
@@ -214,13 +223,22 @@ def _order_blocks(blocks: Sequence[TextBlock], page_width: float) -> tuple[TextB
     )
 
 
-def _extract_pages(document: pymupdf.Document) -> tuple[ExtractedPage, ...]:
+def _extract_pages(document: pymupdf.Document, ocr: OcrOptions) -> tuple[ExtractedPage, ...]:
     """Extract and classify every page before cross-page cleanup."""
 
     pages: list[ExtractedPage] = []
+    ocr_pages = 0
     for index in range(document.page_count):
         page: pymupdf.Page = document.load_page(index)  # type: ignore[no-untyped-call]
         blocks = _extract_blocks(page)
+        native_text = "\n".join(block.text for block in blocks)
+        method: Literal["native", "ocr"] = "native"
+        if needs_ocr(page, native_text, ocr):
+            ocr_pages += 1
+            if ocr_pages > ocr.max_pages:
+                raise RuntimeError("Document exceeds configured OCR page budget")
+            blocks = _extract_blocks(page, recognize_page(page, ocr))
+            method = "ocr"
         width = float(page.rect.width)
         height = float(page.rect.height)
         pages.append(
@@ -230,6 +248,8 @@ def _extract_pages(document: pymupdf.Document) -> tuple[ExtractedPage, ...]:
                 height=height,
                 blocks=_order_blocks(blocks, width),
                 two_column=_is_two_column(blocks, width),
+                extraction_method=method,
+                native_characters=sum(c.isalnum() for c in native_text),
             )
         )
     return tuple(pages)
@@ -318,22 +338,20 @@ def _clean_page(
     return "\n\n".join(clean_blocks).strip()
 
 
-def parse_pdf(pdf_path: Path) -> ParsedDocument:
+def parse_pdf(pdf_path: Path, *, ocr: OcrOptions | None = None) -> ParsedDocument:
     """Parse one PDF into normalized text and page-level character provenance."""
 
+    options = ocr or OcrOptions()
     if not pdf_path.is_file():
         raise FileNotFoundError(pdf_path)
     with pymupdf.open(pdf_path) as document:  # type: ignore[no-untyped-call]
         if document.needs_pass:
             raise ValueError(f"encrypted PDF requires a password: {pdf_path.name}")
-        pages = _extract_pages(document)
+        pages = _extract_pages(document, options)
 
     repeated_margin_lines = _find_repeated_margin_lines(pages)
     counters = _CleaningCounters()
-    clean_pages = [
-        _clean_page(page, repeated_margin_lines, counters)
-        for page in pages
-    ]
+    clean_pages = [_clean_page(page, repeated_margin_lines, counters) for page in pages]
 
     text_parts: list[str] = []
     spans: list[PageSpan] = []
@@ -352,10 +370,13 @@ def parse_pdf(pdf_path: Path) -> ParsedDocument:
                 char_start=start,
                 char_end=cursor,
                 two_column=page.two_column,
+                extraction_method=page.extraction_method,
+                native_characters=page.native_characters,
             )
         )
 
-    text = "".join(text_parts).strip()
+    # Keep separators around empty pages: stripping after recording spans corrupts offsets.
+    text = "".join(text_parts)
     statistics = DocumentStatistics(
         page_count=len(pages),
         raw_character_count=sum(len(block.text) for page in pages for block in page.blocks),
@@ -365,6 +386,7 @@ def parse_pdf(pdf_path: Path) -> ParsedDocument:
         repeated_margin_lines_removed=counters.repeated_margin_lines_removed,
         page_numbers_removed=counters.page_numbers_removed,
         dehyphenations=counters.dehyphenations,
+        ocr_page_count=sum(page.extraction_method == "ocr" for page in pages),
     )
     return ParsedDocument(
         source_pdf=pdf_path.as_posix(),
@@ -373,6 +395,7 @@ def parse_pdf(pdf_path: Path) -> ParsedDocument:
         text=text,
         page_spans=tuple(spans),
         statistics=statistics,
+        ocr_options=options.signature(),
     )
 
 
@@ -393,6 +416,8 @@ def _write_parsed_document(document: ParsedDocument, processed_dir: Path, stem: 
         "source_pdf": document.source_pdf,
         "source_sha256": document.source_sha256,
         "parser_version": document.parser_version,
+        "ocr_options": document.ocr_options,
+        "clean_text_sha256": hashlib.sha256((document.text + "\n").encode()).hexdigest(),
         "page_spans": [asdict(span) for span in document.page_spans],
         "statistics": asdict(document.statistics),
     }
@@ -405,11 +430,13 @@ def parse_corpus(
     processed_dir: Path,
     *,
     overwrite: bool = False,
+    ocr: OcrOptions | None = None,
 ) -> BatchStatistics:
     """Parse every raw PDF and print measurable corpus-quality statistics."""
 
     if not raw_dir.is_dir():
         raise FileNotFoundError(f"raw PDF directory does not exist: {raw_dir}")
+    options = ocr or OcrOptions()
     processed_dir.mkdir(parents=True, exist_ok=True)
     pdf_paths = sorted(raw_dir.glob("*.pdf"))
     parsed = 0
@@ -423,17 +450,32 @@ def parse_corpus(
     for index, pdf_path in enumerate(pdf_paths, start=1):
         text_path = processed_dir / f"{pdf_path.stem}.txt"
         metadata_path = processed_dir / f"{pdf_path.stem}.json"
+        reusable = False
+        existing_metadata: dict[str, Any] = {}
+        existing_text = ""
         if (
             not overwrite
             and text_path.is_file()
             and metadata_path.is_file()
             and text_path.stat().st_mtime >= pdf_path.stat().st_mtime
         ):
+            try:
+                existing_text = text_path.read_text(encoding="utf-8")
+                existing_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+                reusable = (
+                    existing_metadata.get("parser_version") == PARSER_VERSION
+                    and existing_metadata.get("ocr_options") == options.signature()
+                    and existing_metadata.get("source_sha256") == _sha256(pdf_path)
+                    and existing_metadata.get("clean_text_sha256")
+                    == hashlib.sha256(existing_text.encode()).hexdigest()
+                    and bool(existing_text.strip())
+                )
+            except (OSError, ValueError, AttributeError):
+                reusable = False
+        if reusable:
             skipped += 1
-            existing_text = text_path.read_text(encoding="utf-8").rstrip("\n")
-            existing_metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
             existing_stats = existing_metadata["statistics"]
-            total_characters += len(existing_text)
+            total_characters += int(existing_stats["clean_character_count"])
             total_pages += int(existing_stats["page_count"])
             total_empty_pages += int(existing_stats["empty_page_count"])
             total_two_column_pages += int(existing_stats["two_column_page_count"])
@@ -441,9 +483,9 @@ def parse_corpus(
             continue
 
         try:
-            document = parse_pdf(pdf_path)
-            if not document.text:
-                raise ValueError("no extractable text; the PDF may contain scanned images only")
+            document = parse_pdf(pdf_path, ocr=options)
+            if not document.text.strip():
+                raise ValueError("no usable text; enable OCR for scans or inspect blank pages")
             _write_parsed_document(document, processed_dir, pdf_path.stem)
         except (OSError, RuntimeError, ValueError, pymupdf.FileDataError) as exc:
             failures.append({"pdf": pdf_path.name, "error": str(exc)})
@@ -458,7 +500,8 @@ def parse_corpus(
         total_two_column_pages += stats.two_column_page_count
         print(
             f"[{index}/{len(pdf_paths)}] parsed {pdf_path.name}: "
-            f"pages={stats.page_count}, chars={stats.clean_character_count:,}"
+            f"pages={stats.page_count}, chars={stats.clean_character_count:,}, "
+            f"ocr_pages={stats.ocr_page_count}"
         )
 
     completed_documents = parsed + skipped
@@ -484,8 +527,8 @@ def parse_corpus(
 
 def write_parsed_document(document: ParsedDocument, processed_dir: Path, stem: str) -> None:
     """Public single-document output contract for event-driven ingestion."""
-    processed_dir.mkdir(parents=True,exist_ok=True)
-    _write_parsed_document(document,processed_dir,stem)
+    processed_dir.mkdir(parents=True, exist_ok=True)
+    _write_parsed_document(document, processed_dir, stem)
 
 
 def build_argument_parser() -> argparse.ArgumentParser:
@@ -495,6 +538,10 @@ def build_argument_parser() -> argparse.ArgumentParser:
     parser.add_argument("--raw-dir", type=Path, default=None)
     parser.add_argument("--processed-dir", type=Path, default=None)
     parser.add_argument("--overwrite", action="store_true")
+    parser.add_argument("--ocr-mode", choices=["off", "auto", "force"], default=None)
+    parser.add_argument("--ocr-language", default=None)
+    parser.add_argument("--ocr-dpi", type=int, default=None)
+    parser.add_argument("--tessdata", type=Path, default=None)
     return parser
 
 
@@ -505,7 +552,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     settings = get_settings()
     raw_dir = arguments.raw_dir or settings.raw_data_dir
     processed_dir = arguments.processed_dir or settings.processed_data_dir
-    summary = parse_corpus(raw_dir, processed_dir, overwrite=arguments.overwrite)
+    overrides = {
+        key: value
+        for key, value in {
+            "mode": arguments.ocr_mode,
+            "language": arguments.ocr_language,
+            "dpi": arguments.ocr_dpi,
+            "tessdata": arguments.tessdata,
+        }.items()
+        if value is not None
+    }
+    options = OcrOptions.model_validate(
+        {**OcrOptions.from_settings(settings).model_dump(), **overrides}
+    )
+    summary = parse_corpus(raw_dir, processed_dir, overwrite=arguments.overwrite, ocr=options)
     print(
         "Parsing summary: "
         f"discovered={summary.discovered_documents}, parsed={summary.parsed_documents}, "

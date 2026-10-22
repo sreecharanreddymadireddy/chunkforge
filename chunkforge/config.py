@@ -34,6 +34,14 @@ class Settings(BaseSettings):
     reranker_model: str = Field(min_length=1)
     raw_data_dir: Path
     processed_data_dir: Path
+    ocr_mode: Literal["off", "auto", "force"] = "off"
+    ocr_language: str = Field(default="eng", pattern=r"^[a-zA-Z0-9_]+(?:\+[a-zA-Z0-9_]+)*$")
+    ocr_dpi: int = Field(default=200, ge=72, le=400)
+    ocr_min_native_characters: int = Field(default=32, ge=1)
+    ocr_min_image_coverage: float = Field(default=0.6, gt=0, le=1)
+    ocr_max_pages: int = Field(default=50, ge=1)
+    ocr_max_pixels: int = Field(default=20_000_000, ge=1)
+    ocr_tessdata: Path | None = None
     token_encoding: str = "cl100k_base"
     chunk_size: int = Field(default=512, ge=1)
     chunk_overlap: int = Field(default=50, ge=0)

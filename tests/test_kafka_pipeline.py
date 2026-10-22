@@ -14,6 +14,7 @@ from chunkforge.config import Settings
 from chunkforge.embeddings.embedder import EmbeddedChunk
 from chunkforge.ingestion import kafka_pipeline as kafka
 from chunkforge.ingestion.kafka_pipeline import IngestionEvent, make_event, process_message, publish
+from chunkforge.ingestion.ocr import OcrUnavailable
 from chunkforge.store.pgvector_store import PgvectorStore
 
 
@@ -77,7 +78,12 @@ def test_safe_metadata_and_acknowledged_delivery(tmp_path: Path) -> None:
         make_event(source, tmp_path / "different", 100)
 
 
-def test_commit_only_after_processing_and_no_commit_on_operational_failure() -> None:
+@pytest.mark.parametrize(
+    "failure", [OSError("database offline"), OcrUnavailable("language missing")]
+)
+def test_commit_only_after_processing_and_no_commit_on_operational_failure(
+    failure: Exception,
+) -> None:
     """Failed storage leaves the offset uncommitted, so a restart can replay safely."""
     event = IngestionEvent(
         doc_id="paper", relative_path="paper.pdf", sha256="a" * 64, event_id="b" * 64
@@ -93,9 +99,9 @@ def test_commit_only_after_processing_and_no_commit_on_operational_failure() -> 
     consumer.commits.clear()
 
     def failed(e: IngestionEvent) -> list[dict[str, object]]:
-        raise OSError("database offline")
+        raise failure
 
-    with pytest.raises(OSError):
+    with pytest.raises(type(failure)):
         process_message(consumer, Producer(), msg, "dlq", failed)
     assert not consumer.commits
 
@@ -176,6 +182,14 @@ def test_pdf_parse_all_strategy_storage_and_replay(
         sentence_window_size=1,
         late_chunk_size=8,
         kafka_max_pdf_bytes=100000,
+        ocr_mode="off",
+        ocr_language="eng",
+        ocr_dpi=200,
+        ocr_min_native_characters=32,
+        ocr_min_image_coverage=0.6,
+        ocr_max_pages=50,
+        ocr_max_pixels=20000000,
+        ocr_tessdata=None,
     )
     path = tmp_path / "event.pdf"
     with cast(Any, pymupdf).open() as pdf:

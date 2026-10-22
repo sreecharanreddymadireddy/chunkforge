@@ -11,11 +11,14 @@ RUN uv sync --frozen --no-dev --extra api --extra ingestion --extra storage \
     --extra ml --extra resilience --extra retrieval --extra generation --extra kafka --no-editable
 
 FROM python:3.12-slim AS runtime
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr-eng \
+    && rm -rf /var/lib/apt/lists/*
 RUN groupadd --system chunkforge && useradd --system --gid chunkforge chunkforge
 WORKDIR /app
 COPY --from=builder --chown=chunkforge:chunkforge /app/.venv /app/.venv
 COPY --chown=chunkforge:chunkforge chunkforge ./chunkforge
 ENV PATH="/app/.venv/bin:$PATH" \
+    TESSDATA_PREFIX="/usr/share/tesseract-ocr/5/tessdata" \
     HF_HOME="/tmp/chunkforge-models" \
     PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1

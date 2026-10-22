@@ -16,6 +16,7 @@ from chunkforge.chunking.model_backend import BGEBackend
 from chunkforge.config import Settings, get_settings
 from chunkforge.embeddings.embedder import Embedder
 from chunkforge.embeddings.indexer import DocumentIndexer
+from chunkforge.ingestion.ocr import OcrOptions
 from chunkforge.ingestion.parser import parse_pdf, write_parsed_document
 from chunkforge.store.pgvector_store import STRATEGIES, PgvectorStore
 
@@ -193,7 +194,7 @@ class PDFProcessor:
             raise ValueError("Invalid event fingerprint")
         if path.stat().st_size > self.settings.kafka_max_pdf_bytes:
             raise ValueError("PDF exceeds event processing budget")
-        parsed = parse_pdf(path)
+        parsed = parse_pdf(path, ocr=OcrOptions.from_settings(self.settings))
         if not parsed.text.strip() or file_hash(path) != event.sha256:
             raise ValueError("Empty or changed PDF")
         write_parsed_document(parsed, self.settings.processed_data_dir, event.doc_id)

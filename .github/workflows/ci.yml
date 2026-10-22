@@ -47,6 +47,8 @@ jobs:
           enable-cache: true
       - name: Install Python
         run: uv python install 3.12
+      - name: Install OCR language data
+        run: sudo apt-get update && sudo apt-get install -y tesseract-ocr tesseract-ocr-eng
       - name: Install dependencies
         run: >-
           uv sync --frozen --extra dev --extra api --extra ingestion --extra chunking
